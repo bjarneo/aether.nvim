@@ -6,17 +6,18 @@ A Neovim colorscheme inspired by TokyoNight, using a well-structured architectur
 
 ## Philosophy
 
-Aether.nvim provides a dark, elegant theme with carefully chosen colors that create a cohesive visual experience. The architecture is inspired by TokyoNight, offering extensive customization options and plugin support.
+Aether.nvim provides a dark, elegant theme with carefully chosen colors that create a cohesive visual experience. The architecture is inspired by TokyoNight, offering extensive customization options through base16 color injection and plugin support.
 
 ## Features
 
 - **Modern Architecture**: Clean, modular design inspired by TokyoNight
-- **Customizable Colors**: Fine-grained control over all color aspects
+- **Base16 Color Injection**: Easy customization through base16 color overrides
 - **True Color Support**: Full 24-bit color support with `termguicolors`
-- **Extensive Plugin Support**: Built-in support for popular Neovim plugins
+- **Extensive Plugin Support**: Built-in support for 25+ popular Neovim plugins
 - **Configurable Styles**: Control italics, bold, and other style attributes
 - **Transparent Background**: Optional transparent background support
-- **Multiple Color Variants**: Support for subtle backgrounds and accents
+- **Color Callbacks**: Advanced customization with `on_colors` and `on_highlights`
+- **Lualine Theme**: Integrated statusline theme with color injection support
 
 ## Requirements
 
@@ -65,6 +66,34 @@ require("aether").setup()
 vim.cmd.colorscheme("aether")
 ```
 
+### Using with LazyVim
+
+Create a colorscheme plugin file in your LazyVim config:
+
+**File: `~/.config/nvim/lua/plugins/colorscheme.lua`**
+
+```lua
+return {
+  {
+    "bjarneo/aether.nvim",
+    priority = 1000,
+    opts = {
+      transparent = false,
+      colors = {
+        -- Optional: override colors
+        -- base08 = "#ff0000",
+      },
+    },
+  },
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "aether",
+    },
+  },
+}
+```
+
 ## Configuration
 
 Aether.nvim can be configured with the following options:
@@ -86,19 +115,25 @@ require("aether").setup({
   dim_inactive = false, -- Dim inactive windows
   lualine_bold = false, -- Bold lualine section headers
   
-  --- Override colors
+  --- Override colors with base16 injection (easy)
+  colors = {
+    base00 = "#000000",  -- Background
+    base08 = "#f92672",  -- Red
+    -- ... more base16 colors
+  },
+  
+  --- Override colors with callback (advanced)
   ---@param colors ColorScheme
   on_colors = function(colors)
-    -- Modify colors here
-    -- colors.bg = "#000000"
+    colors.hint = colors.orange
+    colors.error = "#ff0000"
   end,
   
   --- Override highlight groups
   ---@param highlights table
   ---@param colors ColorScheme
   on_highlights = function(highlights, colors)
-    -- Modify highlights here
-    -- highlights.Comment = { fg = colors.comment, italic = true }
+    highlights.Comment = { fg = colors.comment, italic = true }
   end,
   
   cache = true, -- Enable caching for better performance
@@ -109,12 +144,12 @@ require("aether").setup({
     -- Auto-enable plugins (detects loaded plugins)
     auto = true,
     -- Or manually enable/disable specific plugins
-    -- telescope = true,
+    -- ["telescope.nvim"] = true,
   },
 })
 ```
 
-### Example Configurations
+### Configuration Examples
 
 #### Transparent Background
 
@@ -128,15 +163,15 @@ require("aether").setup({
 })
 ```
 
-#### Base16 Color Injection (Legacy Support)
+#### Base16 Color Injection
 
-Aether supports direct base16 color injection for easy customization:
+Aether supports base16 color injection for easy customization:
 
 ```lua
 require("aether").setup({
   colors = {
     -- Monotone shades
-    base00 = "#1e1e2e",  -- Background
+    base00 = "#000000",  -- Background
     base01 = "#282828",  -- Lighter background
     base02 = "#383838",  -- Selection background
     base03 = "#585858",  -- Comments
@@ -146,26 +181,27 @@ require("aether").setup({
     base07 = "#f8f8f8",  -- Light background
     
     -- Accent colors
-    base08 = "#f92672",  -- Red
-    base09 = "#fd971f",  -- Orange
-    base0A = "#f4bf75",  -- Yellow
-    base0B = "#a6e22e",  -- Green
-    base0C = "#66d9ef",  -- Cyan
-    base0D = "#66d9ef",  -- Blue
-    base0E = "#ae81ff",  -- Magenta
-    base0F = "#cc6633",  -- Brown
+    base08 = "#f92672",  -- Red (variables, errors)
+    base09 = "#fd971f",  -- Orange (numbers, constants)
+    base0A = "#f4bf75",  -- Yellow (classes, search)
+    base0B = "#a6e22e",  -- Green (strings, git add)
+    base0C = "#66d9ef",  -- Cyan (regex, escapes)
+    base0D = "#66d9ef",  -- Blue (functions, keywords)
+    base0E = "#ae81ff",  -- Magenta (keywords, tags)
+    base0F = "#cc6633",  -- Brown (deprecated)
   }
 })
 ```
 
-#### Customize Colors (Modern Approach)
+#### Advanced Color Customization
 
 ```lua
 require("aether").setup({
   on_colors = function(colors)
     colors.hint = colors.orange
     colors.error = "#ff0000"
-    colors.bg = "#1e1e2e"
+    colors.bg = "#0a0a0a"
+    colors.git.change = colors.yellow
   end
 })
 ```
@@ -184,82 +220,123 @@ require("aether").setup({
 
 ## Supported Plugins
 
-Aether.nvim includes highlight groups for popular Neovim plugins:
+Aether.nvim includes highlight groups for 25+ popular plugins:
 
 ### Core Language Support
-- **LSP**: Diagnostic colors, semantic highlighting, hover windows
+- **LSP**: Diagnostics, semantic highlighting, references, inlay hints
 - **Treesitter**: All `@` capture groups for syntax highlighting
 
 ### File Management & Navigation
-- **Telescope**: Fuzzy finder interface, previews, selections
+- **Telescope**: Fuzzy finder with preview styling
 - **NvimTree**: File explorer with git integration
 - **Neo-tree**: Modern file explorer with enhanced features
 
 ### Git Integration
 - **GitSigns**: Git diff indicators in sign column
 - **Diffview**: Side-by-side diff viewer
+- **Git**: Commit message and diff highlighting
 
 ### Code Enhancement
 - **Flash**: Jump/search highlighting
 - **Trouble**: Diagnostics and quickfix lists
 - **WhichKey**: Keybinding popup interface
 - **Indent Blankline**: Indentation guides
+- **Comment**: Comment highlighting
 
 ### UI & Notifications
 - **Noice**: Enhanced UI components and notifications
 - **Snacks**: UI utilities and components
 - **Fidget**: LSP progress notifications
-- **Lualine**: Status line theme included
+- **Lualine**: Integrated statusline theme
 
 ### Development Tools
 - **Blink.cmp**: Completion menu styling
 - **nvim-dap**: Debugger interface
-- **Conform**: Code formatting integration
+- **Conform**: Code formatting
 - **Lint**: Linting integration
 - **Mini.nvim**: Mini modules support
 - **Mason**: Package manager interface
+- **Markdown**: Enhanced markdown highlighting
 
-## Color Palette
+## Lualine Integration
 
-Aether uses a carefully selected color palette based on these core colors:
+Aether includes a lualine theme that automatically uses your color customizations:
 
-- **Background**: `#000000` - Pure black
-- **Foreground**: `#d8d8d8` - Light gray
-- **Red**: `#f92672` - Vibrant red
-- **Orange**: `#fd971f` - Bright orange
-- **Yellow**: `#f4bf75` - Soft yellow
-- **Green**: `#a6e22e` - Vivid green
-- **Cyan**: `#66d9ef` - Bright cyan
-- **Blue**: `#66d9ef` - Same as cyan
-- **Purple**: `#ae81ff` - Soft purple
-- **Magenta**: `#ae81ff` - Same as purple
+```lua
+require("lualine").setup({
+  options = {
+    theme = "aether",
+    -- ... other lualine options
+  },
+})
+```
 
-These colors are used consistently throughout the theme with various opacity levels for subtle backgrounds and accents.
+The lualine theme will automatically use any base16 colors you've injected via `setup({ colors = {...} })`.
 
 ## Architecture
 
-Aether.nvim follows a modular architecture inspired by TokyoNight:
+Aether.nvim follows a modular architecture:
 
 ```
 lua/aether/
 ├── init.lua           -- Main entry point
 ├── config.lua         -- Configuration options
-├── theme.lua          -- Theme setup logic
-├── utils.lua          -- Utility functions
+├── theme.lua          -- Theme setup and application
+├── colorscheme.lua    -- Color export for external tools
+├── utils.lua          -- Utility functions (blending, etc.)
 ├── colors/
-│   └── init.lua       -- Color palette and processing
+│   └── init.lua       -- Color palette and injection logic
 └── groups/
     ├── init.lua       -- Highlight group loader
-    ├── base.lua       -- Base highlight groups
-    ├── treesitter.lua -- Treesitter groups
-    └── [plugins].lua  -- Plugin-specific groups
+    ├── base.lua       -- Base Neovim highlight groups
+    ├── treesitter.lua -- Treesitter highlight groups
+    ├── lsp.lua        -- LSP and diagnostic highlights
+    └── [plugin].lua   -- Plugin-specific highlight groups
+
+lua/lualine/themes/
+└── aether.lua         -- Lualine theme with color injection
 ```
+
+### How Color Injection Works
+
+1. **Default Palette**: Aether starts with a default color palette in `colors/init.lua`
+2. **Base16 Injection**: Your `colors = { base08 = "..." }` config overrides base16 colors
+3. **Color Derivation**: Theme colors (red, green, blue, etc.) are derived from base16
+4. **Git Colors**: Calculated from the final palette colors
+5. **Highlight Groups**: All highlight groups reference the final derived colors
+6. **External Tools**: Colors cached in `colorscheme.lua` for lualine and other tools
+
+This ensures that when you inject base16 colors, **everything** in the theme uses your custom colors consistently.
+
+## Base16 Color Mapping
+
+Aether follows the base16 specification:
+
+**Monotone Shades** (base00-base07):
+- **base00**: Default background
+- **base01**: Lighter background (status bars, line numbers)
+- **base02**: Selection background
+- **base03**: Comments, invisibles
+- **base04**: Dark foreground
+- **base05**: Default foreground
+- **base06**: Light foreground
+- **base07**: Light background
+
+**Accent Colors** (base08-base0F):
+- **base08**: Variables, errors, functions → `red`
+- **base09**: Numbers, constants → `orange`
+- **base0A**: Classes, search → `yellow`
+- **base0B**: Strings, git add → `green`
+- **base0C**: Regex, escapes → `cyan`
+- **base0D**: Functions, keywords → `blue`
+- **base0E**: Keywords, tags → `purple`/`magenta`
+- **base0F**: Deprecated → brown
 
 ## Troubleshooting
 
 ### Colors appear wrong
 
-Make sure `termguicolors` is enabled (it's enabled by default with Aether):
+Make sure `termguicolors` is enabled (Aether enables it automatically, but check if something overrides it):
 
 ```lua
 vim.opt.termguicolors = true
@@ -270,10 +347,27 @@ vim.opt.termguicolors = true
 If you experience issues after updates, clear the cache:
 
 ```lua
-require("aether.util").cache.clear()
+-- In Neovim command mode
+:lua require("aether").load({ cache = false })
 ```
 
 Or manually delete: `~/.cache/nvim/aether-*.json`
+
+### Lualine colors not updating
+
+If your lualine isn't reflecting your color customizations:
+
+1. Make sure you call `require("aether").setup()` **before** `require("lualine").setup()`
+2. Restart Neovim to reload the lualine theme
+3. Check that you're using `theme = "aether"` in lualine config
+
+### Plugin colors not working
+
+If a plugin isn't styled:
+
+1. Check if the plugin is enabled in `plugins` config (or use `all = true`)
+2. Make sure the plugin is loaded before the colorscheme is applied
+3. Use `auto = true` to auto-detect loaded plugins
 
 ## Contributing
 
@@ -283,6 +377,7 @@ Contributions are welcome! Focus on:
 - Improving color mappings
 - Documentation improvements
 - Bug fixes
+- Sharing custom color palettes
 
 ## License
 
@@ -297,281 +392,3 @@ MIT License.
 
 Created and maintained by Bjarne Øverli.  
 Follow [@iamdothash](https://x.com/iamdothash) on X for updates and more projects.
-
-## How It Works
-
-### Base16 Color Mapping
-
-Aether.nvim follows the base16 specification with these color assignments:
-
-**Monotone Shades** (base00-base07):
-- **base00**: Default background
-- **base01**: Lighter background (status bars, line numbers)
-- **base02**: Selection background
-- **base03**: Comments, invisibles, line highlighting
-- **base04**: Dark foreground (status bars)
-- **base05**: Default foreground, caret, delimiters
-- **base06**: Light foreground
-- **base07**: Light background
-
-**Accent Colors** (base08-base0F):
-- **base08**: Variables, XML tags, markup link text, errors, functions
-- **base09**: Integers, boolean, constants, attributes
-- **base0A**: Classes, types, search highlights
-- **base0B**: Strings, inherited class, markup code
-- **base0C**: Support, regular expressions, special characters
-- **base0D**: Functions, methods, headings, keywords
-- **base0E**: Keywords, storage, selectors, markup italic
-- **base0F**: Deprecated, embedded language tags
-
-### Technical Implementation
-
-The colorscheme works by:
-
-1. **Enabling `termguicolors`**: Uses 24-bit true color support for accurate color rendering
-2. **Using hex color values**: All highlight groups use hex color values from the base16 palette
-3. **Semantic color mapping**: Colors are mapped based on their semantic meaning in the base16 spec
-4. **Customizable palette**: You can override any base16 color with your own values
-
-## Requirements
-
-- **Neovim 0.5+** (Lua support required)
-- Terminal emulator with ANSI color support
-
-## Installation
-
-### Using lazy.nvim
-
-```lua
-{
-  "bjarneo/aether.nvim",
-  priority = 1000,
-  config = function()
-    vim.cmd.colorscheme("aether")
-  end,
-}
-```
-
-### Using packer.nvim
-
-```lua
-use {
-  "bjarneo/aether.nvim",
-  config = function()
-    vim.cmd.colorscheme("aether")
-  end,
-}
-```
-
-### Using vim-plug
-
-```vim
-Plug 'bjarneo/aether.nvim'
-```
-
-Then in your `init.lua`:
-
-```lua
-vim.cmd.colorscheme("aether")
-```
-
-### Using with LazyVim
-
-To use Aether with LazyVim, create a colorscheme plugin file in your LazyVim config:
-
-**File: `~/.config/nvim/lua/plugins/colorscheme.lua`**
-
-```lua
-return {
-  {
-    "bjarneo/aether.nvim",
-    name = "aether",
-    priority = 1000,
-    opts = {
-      disable_italics = false,
-      -- Optionally override colors
-      colors = {
-        -- base08 = "#custom_red",
-      },
-    },
-  },
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "aether",
-    },
-  },
-}
-```
-
-This will:
-1. Install the aether.nvim plugin
-2. Configure LazyVim to use "aether" as the default colorscheme
-3. Apply any custom configuration options you specify
-
-## Usage
-
-### Basic Usage
-
-Simply set the colorscheme in your Neovim configuration:
-
-```lua
--- init.lua
-vim.cmd.colorscheme("aether")
-```
-
-### Configuration
-
-Aether.nvim supports configuration options that can be passed to the `setup` function:
-
-```lua
-require("aether").setup({
-  disable_italics = false,
-  colors = {
-    -- Override any base16 colors with your custom values
-    base00 = "#1e1e2e",  -- Custom background
-    base0D = "#89b4fa",  -- Custom blue
-    -- ... other colors
-  }
-})
-vim.cmd.colorscheme("aether")
-```
-
-#### Available Options
-
-- `disable_italics` (boolean, default: `false`): When set to `true`, disables italic formatting for comments and other elements that use italics.
-- `colors` (table, default: `{}`): Override any of the base16 colors (base00 through base0F) with your custom hex color values.
-
-### Customizing Colors
-
-You can customize the entire color palette by passing a colors table:
-
-```lua
-require("aether").setup({
-  colors = {
-    -- Monotone shades
-    base00 = "#1e1e2e",  -- Background
-    base01 = "#282828",  -- Lighter background
-    base02 = "#383838",  -- Selection background
-    base03 = "#585858",  -- Comments
-    base04 = "#b8b8b8",  -- Dark foreground
-    base05 = "#d8d8d8",  -- Default foreground
-    base06 = "#e8e8e8",  -- Light foreground
-    base07 = "#f8f8f8",  -- Light background
-    
-    -- Accent colors
-    base08 = "#f92672",  -- Red
-    base09 = "#fd971f",  -- Orange
-    base0A = "#f4bf75",  -- Yellow
-    base0B = "#a6e22e",  -- Green
-    base0C = "#66d9ef",  -- Cyan
-    base0D = "#66d9ef",  -- Blue
-    base0E = "#ae81ff",  -- Magenta
-    base0F = "#cc6633",  -- Brown
-  }
-})
-```
-
-## Supported Plugins
-
-Aether.nvim includes highlight groups for popular Neovim plugins:
-
-### Core Language Support
-- **LSP**: Diagnostic colors, semantic highlighting, hover windows
-- **Treesitter**: All `@` capture groups for syntax highlighting
-- **Mason**: Package manager interface
-
-### File Management & Navigation
-- **Telescope**: Fuzzy finder interface, previews, selections
-- **NvimTree**: File explorer with git integration
-- **Neo-tree**: Modern file explorer with enhanced features
-
-### Git Integration
-- **GitSigns**: Git diff indicators in sign column
-- **Git**: Core git highlighting and diff views
-- **Diffview**: Side-by-side diff viewer
-
-### Code Enhancement
-- **Flash**: Jump/search highlighting
-- **Trouble**: Diagnostics and quickfix lists
-- **WhichKey**: Keybinding popup interface
-- **Indent Blankline**: Indentation guides
-- **Comment**: Comment highlighting enhancements
-
-### UI & Notifications
-- **Noice**: Enhanced UI components and notifications
-- **Snacks**: UI utilities and components
-- **Fidget**: LSP progress notifications
-- **Lualine**: Status line theme included at `lua/lualine/themes/aether.lua`
-
-### Development Tools
-- **Blink**: Completion menu styling
-- **nvim-dap**: Debugger interface
-- **Conform**: Code formatting integration
-- **Lint**: Linting integration
-- **Mini**: Mini.nvim modules support
-- **Markdown**: Enhanced markdown highlighting
-
-## Comparison with Traditional Themes
-
-| Feature | ANSI-based Themes | Aether.nvim (Base16) |
-|---------|-------------------|---------------------|
-| Color Definition | Terminal ANSI colors | Hex values (base16) |
-| Customization | Change terminal config | Pass colors to setup() |
-| True Color | No (8/16 colors) | Yes (24-bit) |
-| Color Accuracy | Depends on terminal | Consistent everywhere |
-| Portability | Terminal-dependent | Works same everywhere |
-
-## Examples
-
-## Philosophy: Why Base16?
-
-1. **Standardization**: Base16 is a widely-adopted specification used across many tools
-2. **Flexibility**: Define your palette once and use it everywhere
-3. **Consistency**: Colors maintain semantic meaning across different contexts
-4. **Customization**: Easy to create and share custom color schemes
-5. **True Color**: Full 24-bit color support for accurate color rendering
-
-## Troubleshooting
-
-### Colors appear wrong
-
-Make sure `termguicolors` is enabled:
-
-```lua
--- In your init.lua, before setting colorscheme
-vim.opt.termguicolors = true
-vim.cmd.colorscheme("aether")
-```
-
-### Want different colors
-
-Pass your custom colors to the setup function:
-
-```lua
-require("aether").setup({
-  colors = {
-    base08 = "#ff0000",  -- Custom red
-    base0B = "#00ff00",  -- Custom green
-  }
-})
-```
-
-## Contributing
-
-Contributions are welcome! Focus on:
-
-- Adding support for new plugins
-- Improving base16 color mappings
-- Documentation improvements
-- Bug fixes
-- Sharing custom color palettes
-
-## License
-
-MIT License.
-
-## Author
-
-Follow [@iamdothash](https://x.com/iamdothash) on X for updates and more projects.
-
