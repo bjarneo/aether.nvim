@@ -1,4 +1,4 @@
-" Aether colorscheme for Vim/Neovim - Base16 color scheme
+" Aether colorscheme for Vim/Neovim
 " Maintainer: Bjarne Øverli
 " License: MIT
 
@@ -10,4 +10,4 @@ if !has('nvim')
   finish
 endif
 
-lua require('aether').setup()
+lua require('aether').load()
