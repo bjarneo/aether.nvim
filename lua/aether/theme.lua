@@ -9,9 +9,6 @@ function M.setup(opts)
   local colors = require("aether.colors").setup(opts)
   local groups = require("aether.groups").setup(colors, opts)
 
-  -- Cache colors for external tools (like lualine)
-  require("aether.colorscheme").set(colors)
-
   -- only needed to clear when not the default colorscheme
   if vim.g.colors_name then
     vim.cmd("hi clear")
