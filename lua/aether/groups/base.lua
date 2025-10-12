@@ -119,9 +119,9 @@ function M.get(c, opts)
     qfLineNr                    = { fg = c.dark5 },
 
     -- LSP
-    LspReferenceText            = { bg = c.fg_gutter },
-    LspReferenceRead            = { bg = c.fg_gutter },
-    LspReferenceWrite           = { bg = c.fg_gutter },
+    LspReferenceText            = { bg = c.fg_gutter, fg = c.bg },
+    LspReferenceRead            = { bg = c.fg_gutter, fg = c.bg },
+    LspReferenceWrite           = { bg = c.fg_gutter, fg = c.bg },
     LspSignatureActiveParameter = { bg = Util.blend_bg(c.bg_visual, 0.4), bold = true },
     LspCodeLens                 = { fg = c.comment },
     LspInlayHint                = { bg = Util.blend_bg(c.blue7, 0.1), fg = c.dark3 },
