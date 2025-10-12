@@ -120,7 +120,7 @@ function M.get(c, opts)
 
     -- LSP
     LspReferenceText            = { bg = c.fg_gutter },
-    LspReferenceRead            = { bg = c.fg_gutter },
+    LspReferenceRead            = { bg = c.fg_gutter, fg = c.bg },
     LspReferenceWrite           = { bg = c.fg_gutter },
     LspSignatureActiveParameter = { bg = Util.blend_bg(c.bg_visual, 0.4), bold = true },
     LspCodeLens                 = { fg = c.comment },
