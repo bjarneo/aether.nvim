@@ -68,17 +68,29 @@ local function load_theme(opts)
   return true
 end
 
+--- Check if the theme spec is for aether
+--- @param theme_spec table Theme specification
+--- @return boolean
+local function is_aether_theme(theme_spec)
+  if not theme_spec or not theme_spec[1] then
+    return false
+  end
+
+  local plugin_name = theme_spec[1][1] or theme_spec[1].name
+  return plugin_name and plugin_name:match("aether")
+end
+
 --- Get fresh theme options from lazy.nvim config
 --- @return table|nil opts Theme options or nil if not found
 local function get_theme_opts()
   package.loaded["plugins.theme"] = nil
 
   local ok, theme_spec = pcall(require, "plugins.theme")
-  if ok and theme_spec and theme_spec[1] and theme_spec[1].opts then
-    return theme_spec[1].opts
+  if not ok or not is_aether_theme(theme_spec) then
+    return nil
   end
 
-  return nil
+  return theme_spec[1].opts
 end
 
 --- Reload the aether colorscheme with current configuration
@@ -101,15 +113,13 @@ end
 --- Reload the aether colorscheme with fresh options from config
 --- This clears ALL modules including config and reloads with new options
 local function reload_with_fresh_opts()
-  clear_aether_modules(true) -- Clear everything including config
-
   local opts = get_theme_opts()
   if not opts then
-    vim.notify("Failed to load theme options, falling back to simple reload", vim.log.levels.WARN)
-    reload_colorscheme()
+    -- Theme is not aether or failed to load, skip reload
     return
   end
 
+  clear_aether_modules(true) -- Clear everything including config
   clear_highlights()
 
   if not load_theme(opts) then
