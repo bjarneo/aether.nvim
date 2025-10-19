@@ -8,10 +8,13 @@ local function is_aether_active()
   return vim.g.colors_name == "aether"
 end
 
---- Clear all loaded aether modules from package.loaded
+--- Clear all loaded aether modules from package.loaded, except config
+--- The config module should NOT be cleared because it contains the latest
+--- options that were set by lazy.nvim's config function during reload
 local function clear_aether_modules()
   for module_name, _ in pairs(package.loaded) do
-    if module_name:match("^aether") or module_name:match("^lualine%.themes%.aether") then
+    -- Skip the config module to preserve user options
+    if module_name ~= "aether.config" and (module_name:match("^aether") or module_name:match("^lualine%.themes%.aether")) then
       package.loaded[module_name] = nil
     end
   end
@@ -19,7 +22,7 @@ end
 
 --- Reload the aether colorscheme with the current configuration
 local function reload_colorscheme()
-  -- Clear cached modules
+  -- Clear cached modules (except config which has the latest options)
   clear_aether_modules()
 
   -- Reload and reapply the theme
@@ -34,6 +37,7 @@ local function reload_colorscheme()
     end
 
     -- Reapply the colorscheme by calling load directly
+    -- This will use the options already stored in the config module
     aether.load()
 
     vim.notify("aether.nvim reloaded", vim.log.levels.INFO)
@@ -43,7 +47,9 @@ end
 --- Setup the hotreload autocmd
 function M.setup()
   -- Listen for LazyReload events (triggered after :Lazy reload aether completes)
-  -- This uses vim.defer_fn to ensure it runs after lazy.nvim finishes reloading
+  -- Note: When lazy.nvim reloads the plugin, it re-runs the config function which
+  -- calls setup(opts) with the new options. However, we still need to force a
+  -- colorscheme reload to apply the changes to the UI.
   vim.api.nvim_create_autocmd("User", {
     pattern = "LazyReload",
     callback = function(event)
@@ -58,6 +64,7 @@ function M.setup()
       end
 
       -- Defer the reload to ensure it happens after lazy.nvim completes
+      -- Lazy.nvim's config function has already been called with new opts by now
       vim.defer_fn(function()
         reload_colorscheme()
       end, 2000)
