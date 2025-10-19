@@ -112,12 +112,15 @@ end
 
 --- Reload the aether colorscheme with fresh options from config
 --- This clears ALL modules including config and reloads with new options
+--- This works both when aether is active (reload) and when switching to aether (load)
 local function reload_with_fresh_opts()
   local opts = get_theme_opts()
   if not opts then
     -- Theme is not aether or failed to load, skip reload
     return
   end
+
+  local was_active = is_aether_active()
 
   clear_aether_modules(true) -- Clear everything including config
   clear_highlights()
@@ -127,7 +130,12 @@ local function reload_with_fresh_opts()
   end
 
   trigger_post_reload_events()
-  vim.notify("aether.nvim reloaded with new colors", vim.log.levels.INFO)
+
+  if was_active then
+    vim.notify("aether.nvim reloaded with new colors", vim.log.levels.INFO)
+  else
+    vim.notify("aether.nvim loaded", vim.log.levels.INFO)
+  end
 end
 
 --- Setup autocmd for lazy.nvim reload events
@@ -135,16 +143,15 @@ local function setup_lazy_reload_autocmd()
   vim.api.nvim_create_autocmd("User", {
     pattern = "LazyReload",
     callback = function(event)
-      if not is_aether_active() then
-        return
-      end
-
       -- Only handle aether plugin reloads
       if event.data and event.data ~= "aether.nvim" and event.data ~= "aether" then
         return
       end
 
       -- Defer to ensure lazy.nvim completes its reload process
+      -- Note: We check if the config has aether inside reload_with_fresh_opts()
+      -- instead of checking is_aether_active() here, because we want to reload
+      -- when switching TO aether, not just when aether is already active
       vim.defer_fn(reload_with_fresh_opts, LAZY_RELOAD_DELAY_MS)
     end,
     desc = "Reload aether theme when lazy.nvim detects changes",
