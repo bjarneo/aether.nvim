@@ -42,7 +42,8 @@ end
 
 --- Setup the hotreload autocmd
 function M.setup()
-  -- Listen for LazyReload events (triggered when any plugin is reloaded via :Lazy reload)
+  -- Listen for LazyReload events (triggered after :Lazy reload aether completes)
+  -- This uses vim.defer_fn to ensure it runs after lazy.nvim finishes reloading
   vim.api.nvim_create_autocmd("User", {
     pattern = "LazyReload",
     callback = function(event)
@@ -56,10 +57,21 @@ function M.setup()
         return
       end
 
-      -- Reload aether colorscheme
-      reload_colorscheme()
+      -- Defer the reload to ensure it happens after lazy.nvim completes
+      vim.defer_fn(function()
+        reload_colorscheme()
+      end, 100)
     end,
   })
+
+  -- Also create a user command for manual reloading
+  vim.api.nvim_create_user_command("AetherReload", function()
+    if is_aether_active() then
+      reload_colorscheme()
+    else
+      vim.notify("aether is not the active colorscheme", vim.log.levels.WARN)
+    end
+  end, { desc = "Reload aether colorscheme" })
 
   -- Also listen for BufWritePost events in the aether.nvim directory
   -- This provides instant feedback during development
