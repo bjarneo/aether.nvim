@@ -60,7 +60,7 @@ function M.setup()
       -- Defer the reload to ensure it happens after lazy.nvim completes
       vim.defer_fn(function()
         reload_colorscheme()
-      end, 100)
+      end, 2000)
     end,
   })
 
