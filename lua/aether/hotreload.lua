@@ -59,9 +59,7 @@ end
 --- Setup the hotreload autocmd
 function M.setup()
   -- Listen for LazyReload events (triggered after :Lazy reload aether completes)
-  -- Note: When lazy.nvim reloads the plugin, it re-runs the config function which
-  -- calls setup(opts) with the new options. However, we still need to force a
-  -- colorscheme reload to apply the changes to the UI.
+  -- This also fires when lazy.nvim's change detection sees config file changes
   vim.api.nvim_create_autocmd("User", {
     pattern = "LazyReload",
     callback = function(event)
@@ -71,14 +69,48 @@ function M.setup()
       end
 
       -- Check if aether.nvim was reloaded (event.data contains plugin name)
-      if event.data and event.data ~= "aether.nvim" then
+      if event.data and event.data ~= "aether.nvim" and event.data ~= "aether" then
         return
       end
 
       -- Defer the reload to ensure it happens after lazy.nvim completes
-      -- Lazy.nvim's config function has already been called with new opts by now
+      -- When LazyReload fires, lazy.nvim has already re-run the config function
+      -- with new opts, but we need to force a full reload to apply them
       vim.defer_fn(function()
-        reload_colorscheme()
+        -- Clear ALL modules including config, then reload fresh from lazy's config
+        for module_name, _ in pairs(package.loaded) do
+          if module_name:match("^aether") or module_name:match("^lualine%.themes%.aether") then
+            package.loaded[module_name] = nil
+          end
+        end
+
+        -- Clear theme module to get fresh opts
+        package.loaded["plugins.theme"] = nil
+
+        -- Load the theme spec to get the latest opts
+        local ok, theme_spec = pcall(require, "plugins.theme")
+        if ok and theme_spec and theme_spec[1] and theme_spec[1].opts then
+          -- Aggressively clear all highlights
+          vim.cmd("highlight clear")
+          if vim.fn.exists("syntax_on") == 1 then
+            vim.cmd("syntax reset")
+          end
+          vim.g.colors_name = nil
+
+          -- Load aether with fresh opts
+          local aether = require("aether")
+          aether.setup(theme_spec[1].opts)
+          aether.load()
+
+          -- Trigger ColorScheme event and redraw
+          vim.api.nvim_exec_autocmds("ColorScheme", { pattern = "aether", modeline = false })
+          vim.cmd("redraw!")
+
+          vim.notify("aether.nvim reloaded with new colors", vim.log.levels.INFO)
+        else
+          -- Fallback to simple reload if theme spec not available
+          reload_colorscheme()
+        end
       end, 2000)
     end,
   })
