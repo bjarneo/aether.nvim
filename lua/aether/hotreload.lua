@@ -5,8 +5,8 @@
 local M = {}
 
 -- Configuration constants
-local LAZY_RELOAD_DELAY_MS = 2000
-local OMARCHY_RELOAD_DELAY_MS = 2000
+local LAZY_RELOAD_DELAY_MS = 100
+local OMARCHY_RELOAD_DELAY_MS = 100
 local OMARCHY_THEME_PATH = vim.fn.expand("~/.config/omarchy/current/theme/neovim.lua")
 
 -- Patterns for module matching
