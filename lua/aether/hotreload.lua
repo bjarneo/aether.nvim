@@ -19,11 +19,6 @@ end
 
 --- Reload the aether colorscheme with the current configuration
 local function reload_colorscheme()
-  -- Only reload if aether is currently active
-  if not is_aether_active() then
-    return
-  end
-
   -- Clear cached modules
   clear_aether_modules()
 
@@ -43,29 +38,17 @@ end
 
 --- Setup the hotreload autocmd
 function M.setup()
-  -- Listen for LazyReload events (triggered when plugins are reloaded via :Lazy reload)
+  -- Listen for LazyReload events (triggered when any plugin is reloaded via :Lazy reload)
   vim.api.nvim_create_autocmd("User", {
     pattern = "LazyReload",
-    callback = function(event)
-      -- Only proceed if aether is active
+    callback = function()
+      -- Only proceed if aether is the active colorscheme
       if not is_aether_active() then
         return
       end
 
-      -- Check if aether.nvim was reloaded
-      local should_reload = false
-      if event.data and event.data.plugins then
-        for _, plugin in ipairs(event.data.plugins) do
-          if plugin.name == "aether.nvim" or plugin.name == "aether" then
-            should_reload = true
-            break
-          end
-        end
-      end
-
-      if should_reload then
-        reload_colorscheme()
-      end
+      -- Reload aether colorscheme
+      reload_colorscheme()
     end,
   })
 
