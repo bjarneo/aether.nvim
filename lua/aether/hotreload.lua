@@ -111,7 +111,7 @@ function M.setup()
           -- Fallback to simple reload if theme spec not available
           reload_colorscheme()
         end
-      end, 2000)
+      end, 50)
     end,
   })
 
