@@ -93,6 +93,38 @@ function M.setup()
       end
     end,
   })
+
+  -- Watch for changes to external theme configuration files (like omarchy)
+  -- These files might be symlinked into the Neovim config
+  local omarchy_theme_path = vim.fn.expand("~/.config/omarchy/current/theme/neovim.lua")
+  if vim.fn.filereadable(omarchy_theme_path) == 1 then
+    vim.api.nvim_create_autocmd("BufWritePost", {
+      pattern = omarchy_theme_path,
+      callback = function()
+        if is_aether_active() then
+          -- Defer to allow file changes to propagate and lazy.nvim to reload
+          vim.defer_fn(function()
+            -- Clear the theme plugin module to pick up new config
+            package.loaded["plugins.theme"] = nil
+
+            -- Load the new theme spec to get updated opts
+            local ok, theme_spec = pcall(require, "plugins.theme")
+            if ok and theme_spec and theme_spec[1] and theme_spec[1].opts then
+              -- Clear aether modules except config, then update config with new opts
+              clear_aether_modules()
+
+              -- Now update the config with the new options
+              local aether = require("aether")
+              aether.setup(theme_spec[1].opts)
+
+              -- Reload with new config
+              reload_colorscheme()
+            end
+          end, 100)
+        end
+      end,
+    })
+  end
 end
 
 return M
