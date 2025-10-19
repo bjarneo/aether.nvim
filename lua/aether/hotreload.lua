@@ -24,14 +24,18 @@ local function reload_colorscheme()
 
   -- Reload and reapply the theme
   vim.schedule(function()
+    -- Force clear highlight groups
+    vim.cmd("hi clear")
+
     local ok, aether = pcall(require, "aether")
     if not ok then
       vim.notify("Failed to reload aether.nvim", vim.log.levels.ERROR)
       return
     end
 
-    -- Reapply the colorscheme
-    vim.cmd.colorscheme("aether")
+    -- Reapply the colorscheme by calling load directly
+    aether.load()
+
     vim.notify("aether.nvim reloaded", vim.log.levels.INFO)
   end)
 end
@@ -41,9 +45,14 @@ function M.setup()
   -- Listen for LazyReload events (triggered when any plugin is reloaded via :Lazy reload)
   vim.api.nvim_create_autocmd("User", {
     pattern = "LazyReload",
-    callback = function()
+    callback = function(event)
       -- Only proceed if aether is the active colorscheme
       if not is_aether_active() then
+        return
+      end
+
+      -- Check if aether.nvim was reloaded (event.data contains plugin name)
+      if event.data and event.data ~= "aether.nvim" then
         return
       end
 
