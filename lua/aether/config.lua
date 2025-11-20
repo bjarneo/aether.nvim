@@ -4,6 +4,7 @@ local M = {}
 ---@field on_colors fun(colors: ColorScheme)
 ---@field on_highlights fun(highlights: aether.Highlights, colors: ColorScheme)
 M.defaults = {
+  name = "aether", -- The name of the colorscheme (useful for creating variants)
   transparent = false, -- Enable this to disable setting the background color
   terminal_colors = true, -- Configure the colors used when opening a `:terminal` in Neovim
   styles = {

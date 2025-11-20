@@ -15,7 +15,7 @@ function M.setup(opts)
   end
 
   vim.o.termguicolors = true
-  vim.g.colors_name = "aether"
+  vim.g.colors_name = opts.name
 
   for group, hl in pairs(groups) do
     hl = type(hl) == "string" and { link = hl } or hl

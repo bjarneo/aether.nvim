@@ -169,6 +169,7 @@ return {
 
 ```lua
 require("aether").setup({
+    name = "aether",               -- Colorscheme name (useful for creating variants)
     transparent = false,           -- Enable transparent background
     terminal_colors = true,        -- Configure terminal colors
     dim_inactive = false,          -- Dim inactive windows
