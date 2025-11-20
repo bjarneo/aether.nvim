@@ -169,7 +169,6 @@ return {
 
 ```lua
 require("aether").setup({
-    name = "aether",               -- Colorscheme name (useful for creating variants)
     transparent = false,           -- Enable transparent background
     terminal_colors = true,        -- Configure terminal colors
     dim_inactive = false,          -- Dim inactive windows
@@ -317,6 +316,45 @@ The lualine theme automatically uses your custom base16 colors.
 - Mini.nvim
 - Mason
 - Comment
+
+## Creating Theme Variants
+
+You can create your own colorscheme variant with a custom name by creating a `colors/*.lua` file in your Neovim config:
+
+**~/.config/nvim/colors/hackerman.lua:**
+```lua
+-- Load aether with custom config
+require("aether").load({
+    name = "hackerman",
+    colors = {
+        -- Your custom colors
+        base00 = "#000000",
+        base08 = "#00ff00",
+        -- etc...
+    },
+})
+```
+
+Then use it like any other colorscheme:
+```vim
+:colorscheme hackerman
+```
+
+Or with lazy.nvim:
+```lua
+{
+    "bjarneo/aether.nvim",
+    priority = 1000,
+}
+
+-- In your LazyVim config:
+{
+    "LazyVim/LazyVim",
+    opts = {
+        colorscheme = "hackerman",
+    },
+}
+```
 
 ## Examples
 
