@@ -56,11 +56,13 @@ function M.setup(colors, opts)
   -- Load plugin groups based on configuration
   for plugin, group_name in pairs(M.plugins) do
     if opts.plugins.all or (opts.plugins[plugin] ~= false) then
-      if opts.plugins.auto and not vim.tbl_contains(vim.tbl_keys(opts.plugins), plugin) then
-        if not package.loaded[plugin] and not vim.tbl_contains(vim.tbl_keys(package.loaded), plugin) then
-          goto continue
-        end
-      end
+      -- checking package.loaded is not enough for lazy loaded plugins,
+      -- so we load all plugins by default unless explicitly disabled
+      -- if opts.plugins.auto and not vim.tbl_contains(vim.tbl_keys(opts.plugins), plugin) then
+      --   if not package.loaded[plugin] and not vim.tbl_contains(vim.tbl_keys(package.loaded), plugin) then
+      --     goto continue
+      --   end
+      -- end
 
       local plugin_groups = M.get(group_name, colors, opts)
       ret = vim.tbl_deep_extend("force", ret, plugin_groups)
