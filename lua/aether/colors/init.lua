@@ -150,7 +150,7 @@ function M.setup(opts)
   -- This ensures git colors are derived from the theme colors
   colors.git.add = colors.green2 or colors.green
   colors.git.delete = colors.red1 or colors.red
-  colors.git.change = colors.yellow  -- Use yellow for changes instead of cyan-ish blue
+  colors.git.change = colors.orange or colors.yellow
 
   -- Diff colors using tokyonight approach
   colors.diff = {
