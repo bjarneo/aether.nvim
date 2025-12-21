@@ -7,7 +7,7 @@
 **Author:** Bjarne Øverli
 **License:** MIT
 
-Aether.nvim is a modern, modular Neovim colorscheme with extensive plugin support and direct color injection capabilities. Inspired by TokyoNight, it provides comprehensive customization through a well-structured architecture.
+Aether.nvim is a modern, modular Neovim colorscheme with extensive plugin support and base16 color injection capabilities. Inspired by TokyoNight, it provides comprehensive customization through a well-structured architecture.
 
 ## Core Architecture
 
@@ -37,11 +37,11 @@ Apply to Neovim via vim.api.nvim_set_hl()
 - Options: transparent, terminal_colors, styles, sidebars, floats, dim_inactive, lualine_bold, colors, on_colors(), on_highlights(), cache, plugins
 - Uses metatable pattern for default fallback
 
-### colors/init.lua
-- Defines semantic color palette (bg, fg, blue, green, red, yellow, etc.)
-- Direct color injection via `opts.colors`
+### colors/init.lua (236 lines)
+- Defines 40+ color palette (bg, fg, blue, green, red, yellow, etc.)
+- Base16 mapping: base00-base0F → semantic colors
 - Color derivation: git colors, diff colors, blended backgrounds
-- `M.setup(opts)`: Apply color injection, calculate derived colors, call on_colors()
+- `M.setup(opts)`: Apply base16 injection, calculate derived colors, call on_colors()
 
 ### theme.lua
 - `M.setup(opts)`: Main orchestration function
@@ -61,10 +61,11 @@ Apply to Neovim via vim.api.nvim_set_hl()
 - Plugin detection modes: `all`, `auto` (checks package.loaded), or explicit
 
 ### utils.lua
-- Color math: `rgb()`, `blend()`, `blend_bg()`, `blend_fg()`
+- Color math: `rgb()`, `blend()`, `darken()`, `lighten()`
 - `resolve()`: Flatten style tables into highlight definitions
+- `hi()`: Build and execute highlight commands
 
-### hotreload.lua - IMPORTANT
+### hotreload.lua (216 lines) - IMPORTANT
 - Auto-reloads theme during development when aether is active
 - Listens to BufWritePost on lua files and LazyReload event
 - `AetherReload` user command for manual reload
@@ -73,12 +74,12 @@ Apply to Neovim via vim.api.nvim_set_hl()
 
 ## Highlight Groups Structure
 
-**25 group files:**
+**25 group files totaling 1026 lines:**
 
 Core:
-- `base.lua` - Neovim standard groups
-- `treesitter.lua` - TreeSitter @ captures
-- `lsp.lua` - LSP diagnostics/semantic tokens
+- `base.lua` (162 lines) - Neovim standard groups
+- `treesitter.lua` (105 lines) - TreeSitter @ captures
+- `lsp.lua` (51 lines) - LSP diagnostics/semantic tokens
 
 Plugins (22 files):
 - Navigation: telescope, nvim-tree, neo-tree, trouble, flash, which-key
@@ -115,8 +116,8 @@ return M
 
 ### Configuration Customization
 ```lua
--- Direct color injection
-opts.colors = { red = "#ff0000", bg = "#000000" }
+-- Base16 injection
+opts.colors = { base08 = "#ff0000" }
 
 -- Semantic color adjustment
 on_colors = function(colors)
@@ -138,9 +139,9 @@ end
 4. Test with `opts.plugins = { all = true }`
 
 ### Color Derivation
+- Base16 colors → semantic colors (base08 → red)
 - Derived colors calculated in `colors/init.lua`
-- Use `utils.blend_bg()` for alpha blending towards background
-- Use `utils.blend_fg()` for alpha blending towards foreground
+- Use `utils.blend()` for alpha blending
 - Git/diff colors: green/red/yellow base with 25% alpha blends
 
 ### Plugin Detection
@@ -159,10 +160,10 @@ end
 ## File Reference Quick Guide
 
 **Must read for understanding:**
-- `lua/aether/init.lua` - Entry point
-- `lua/aether/theme.lua` - Orchestration
-- `lua/aether/colors/init.lua` - Color system
-- `lua/aether/groups/init.lua` - Plugin system
+- `lua/aether/init.lua` - Entry point (18 lines)
+- `lua/aether/theme.lua` - Orchestration (62 lines)
+- `lua/aether/colors/init.lua` - Color system (236 lines)
+- `lua/aether/groups/init.lua` - Plugin system (74 lines)
 
 **Common edit targets:**
 - `lua/aether/config.lua` - Add/modify options
@@ -175,6 +176,14 @@ end
 - `lua/aether/hotreload.lua` - Development reload logic
 - `lua/lualine/themes/aether.lua` - Statusline theme
 
+## Recent Development Focus
+
+Based on git history, recent work includes:
+- Theme switching with immediate reload
+- Hotreload optimization (100ms defer, conditional reload)
+- Module organization improvements
+- LuaLS annotations for better IDE support
+
 ## Important Notes
 
 1. **Never edit files outside lua/aether/** except lualine theme
@@ -182,7 +191,7 @@ end
 3. **Use blend functions** from utils.lua for color mixing
 4. **Test with hotreload enabled** during development
 5. **Follow existing group file patterns** when adding plugins
-6. **Color injection affects derived colors** - understand cascade
+6. **Base16 injection affects derived colors** - understand cascade
 7. **Plugin auto-detection requires lazy.nvim** for package.loaded
 8. **Color names are semantic** - blue doesn't mean #0000ff, check palette
 9. **Highlights can link** - use string value instead of table
@@ -196,7 +205,7 @@ When making changes:
 - [ ] Test plugin detection (all/auto/manual)
 - [ ] Verify hotreload works
 - [ ] Check lualine theme consistency
-- [ ] Test color injection
+- [ ] Test base16 injection
 - [ ] Verify terminal colors if enabled
 - [ ] Check dark/transparent/normal sidebar/float modes
 
@@ -218,5 +227,6 @@ When making changes:
 
 **Debug color issues:**
 1. Check palette in `lua/aether/colors/init.lua`
-2. Check on_colors() callback if used
-3. Inspect final colors with `:lua =require('aether.colorscheme').get()`
+2. Verify base16 mapping
+3. Check on_colors() callback if used
+4. Inspect final colors with `:lua =require('aether.colorscheme').get()`
