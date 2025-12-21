@@ -2,6 +2,8 @@
 
 A modern Neovim colorscheme with semantic color customization and extensive plugin support.
 
+> **Note:** This is the `v2` branch with a cleaner API. Use `branch = "v2"` in your plugin config.
+
 ![Aether.nvim](theme.png)
 
 ## Features
@@ -24,6 +26,7 @@ A modern Neovim colorscheme with semantic color customization and extensive plug
 ```lua
 {
     "bjarneo/aether.nvim",
+    branch = "v2",
     priority = 1000,
     config = function()
         require("aether").setup()
@@ -37,6 +40,7 @@ A modern Neovim colorscheme with semantic color customization and extensive plug
 ```lua
 {
     "bjarneo/aether.nvim",
+    branch = "v2",
     name = "aether",
     priority = 1000,
     opts = {
@@ -75,6 +79,7 @@ A modern Neovim colorscheme with semantic color customization and extensive plug
 ```lua
 {
     "bjarneo/aether.nvim",
+    branch = "v2",
     name = "aether",
     priority = 1000,
     opts = {
@@ -103,6 +108,7 @@ Create `~/.config/nvim/lua/plugins/colorscheme.lua`:
 return {
     {
         "bjarneo/aether.nvim",
+        branch = "v2",
         name = "aether",
         priority = 1000,
         opts = {
