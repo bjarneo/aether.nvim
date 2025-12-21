@@ -1,12 +1,12 @@
 # Aether.nvim
 
-A modern Neovim colorscheme with base16 color customization and extensive plugin support.
+A modern Neovim colorscheme with semantic color customization and extensive plugin support.
 
 ![Aether.nvim](theme.png)
 
 ## Features
 
-- Base16 color injection for easy customization
+- Direct color injection for easy customization
 - Support for 25+ popular Neovim plugins
 - Transparent background support
 - Hot reload for development
@@ -42,25 +42,25 @@ A modern Neovim colorscheme with base16 color customization and extensive plugin
     opts = {
         transparent = false,
         colors = {
-            -- Monotone shades (base00-base07)
-            base00 = "#0c0c0c", -- Default background
-            base01 = "#bfac89", -- Lighter background (status bars)
-            base02 = "#0c0c0c", -- Selection background
-            base03 = "#bfac89", -- Comments, invisibles
-            base04 = "#e4bf7c", -- Dark foreground
-            base05 = "#f5e8d1", -- Default foreground
-            base06 = "#f5e8d1", -- Light foreground
-            base07 = "#e4bf7c", -- Light background
+            -- Background colors
+            bg = "#0c0c0c",
+            bg_dark = "#0c0c0c",
+            bg_highlight = "#1a1a1a",
 
-            -- Accent colors (base08-base0F)
-            base08 = "#d40d09", -- Variables, errors, red
-            base09 = "#f6312d", -- Integers, constants, orange
-            base0A = "#dd920a", -- Classes, types, yellow
-            base0B = "#969408", -- Strings, green
-            base0C = "#4a8699", -- Support, regex, cyan
-            base0D = "#275d7c", -- Functions, keywords, blue
-            base0E = "#bb3b74", -- Keywords, storage, magenta
-            base0F = "#f6af2e", -- Deprecated, brown/yellow
+            -- Foreground colors
+            fg = "#f5e8d1",
+            fg_dark = "#e4bf7c",
+            comment = "#bfac89",
+
+            -- Accent colors
+            red = "#d40d09",
+            orange = "#fd971f",
+            yellow = "#dd920a",
+            green = "#969408",
+            cyan = "#4a8699",
+            blue = "#275d7c",
+            purple = "#bb3b74",
+            magenta = "#ae81ff",
         },
     },
     config = function(_, opts)
@@ -79,8 +79,9 @@ A modern Neovim colorscheme with base16 color customization and extensive plugin
     priority = 1000,
     opts = {
         colors = {
-            base00 = "#0c0c0c",
-            base08 = "#d40d09",
+            bg = "#0c0c0c",
+            fg = "#f5e8d1",
+            red = "#d40d09",
             -- ... your colors
         },
     },
@@ -90,30 +91,6 @@ A modern Neovim colorscheme with base16 color customization and extensive plugin
 
         -- Enable hot reload - theme auto-reloads when you save lua files
         require("aether.hotreload").setup()
-    end,
-}
-```
-
-### With Omarchy Integration
-
-```lua
-{
-    "bjarneo/aether.nvim",
-    name = "aether",
-    priority = 1000,
-    opts = {
-        colors = {
-            -- Your base16 colors
-        },
-    },
-    config = function(_, opts)
-        require("aether").setup(opts)
-        vim.cmd.colorscheme("aether")
-
-        -- Watch external config file for changes
-        require("aether.hotreload").setup({
-            watch_external_config = "~/.config/omarchy/current/theme/neovim.lua"
-        })
     end,
 }
 ```
@@ -130,22 +107,17 @@ return {
         priority = 1000,
         opts = {
             colors = {
-                base00 = "#0c0c0c",
-                base01 = "#bfac89",
-                base02 = "#0c0c0c",
-                base03 = "#bfac89",
-                base04 = "#e4bf7c",
-                base05 = "#f5e8d1",
-                base06 = "#f5e8d1",
-                base07 = "#e4bf7c",
-                base08 = "#d40d09",
-                base09 = "#f6312d",
-                base0A = "#dd920a",
-                base0B = "#969408",
-                base0C = "#4a8699",
-                base0D = "#275d7c",
-                base0E = "#bb3b74",
-                base0F = "#f6af2e",
+                bg = "#0c0c0c",
+                fg = "#f5e8d1",
+                comment = "#bfac89",
+                red = "#d40d09",
+                orange = "#f6312d",
+                yellow = "#dd920a",
+                green = "#969408",
+                cyan = "#4a8699",
+                blue = "#275d7c",
+                purple = "#bb3b74",
+                magenta = "#ae81ff",
             },
         },
         config = function(_, opts)
@@ -183,24 +155,33 @@ require("aether").setup({
         floats = "dark",           -- "dark", "transparent", or "normal"
     },
 
-    -- Base16 color injection
+    -- Color customization (override any palette color)
     colors = {
-        base00 = "#000000",        -- Background
-        base01 = "#282828",        -- Lighter background
-        base02 = "#383838",        -- Selection background
-        base03 = "#585858",        -- Comments
-        base04 = "#b8b8b8",        -- Dark foreground
-        base05 = "#d8d8d8",        -- Default foreground
-        base06 = "#e8e8e8",        -- Light foreground
-        base07 = "#f8f8f8",        -- Light background
-        base08 = "#f92672",        -- Red (variables, errors)
-        base09 = "#fd971f",        -- Orange (numbers, constants)
-        base0A = "#f4bf75",        -- Yellow (classes, types)
-        base0B = "#a6e22e",        -- Green (strings)
-        base0C = "#66d9ef",        -- Cyan (regex, escapes)
-        base0D = "#66d9ef",        -- Blue (functions, keywords)
-        base0E = "#ae81ff",        -- Magenta (keywords, tags)
-        base0F = "#cc6633",        -- Brown (deprecated)
+        -- Background colors
+        bg = "#000000",            -- Default editor background
+        bg_dark = "#000000",       -- Darker background (sidebars, statusline)
+        bg_highlight = "#000000",  -- Highlighted lines (cursorline)
+
+        -- Foreground colors
+        fg = "#d8d8d8",            -- Default text color
+        fg_dark = "#b8b8b8",       -- Darker text (statusline, inactive)
+        fg_gutter = "#585858",     -- Line numbers, fold column
+        comment = "#585858",       -- Comments
+
+        -- Accent colors
+        red = "#f92672",           -- Errors, deletions, important syntax
+        orange = "#fd971f",        -- Numbers, constants, warnings
+        yellow = "#f4bf75",        -- Types, classes, search highlights
+        green = "#a6e22e",         -- Strings, success, git additions
+        cyan = "#66d9ef",          -- Regex, escape sequences
+        blue = "#66d9ef",          -- Functions, keywords, info
+        purple = "#ae81ff",        -- Keywords, tags, storage
+        magenta = "#ae81ff",       -- Special keywords, bold syntax
+
+        -- Additional colors
+        teal = "#66d9ef",          -- Hints, support syntax
+        terminal_black = "#282828", -- Terminal black color
+        special_char = "#cc6633",  -- Escape sequences in strings
     },
 
     -- Advanced: Customize derived colors
@@ -223,27 +204,57 @@ require("aether").setup({
 })
 ```
 
-## Base16 Color Reference
+## Color Reference
 
-**Monotone (base00-base07):**
-- `base00` - Default background
-- `base01` - Lighter background (status bars)
-- `base02` - Selection background
-- `base03` - Comments, invisibles
-- `base04` - Dark foreground
-- `base05` - Default foreground
-- `base06` - Light foreground
-- `base07` - Light background
+**Background colors:**
+- `bg` - Default editor background
+- `bg_dark` - Darker background (sidebars, statusline, popups)
+- `bg_highlight` - Highlighted lines (cursorline)
 
-**Accent Colors (base08-base0F):**
-- `base08` - Red (variables, errors)
-- `base09` - Orange (numbers, constants)
-- `base0A` - Yellow (classes, types)
-- `base0B` - Green (strings)
-- `base0C` - Cyan (regex, escapes)
-- `base0D` - Blue (functions, keywords)
-- `base0E` - Magenta (keywords, tags)
-- `base0F` - Brown (deprecated)
+**Foreground colors:**
+- `fg` - Default text color
+- `fg_dark` - Darker text (statusline, inactive windows)
+- `fg_gutter` - Line numbers, fold column, sign column
+- `comment` - Comments
+
+**Accent colors:**
+- `red` - Errors, deletions, important syntax, variables
+- `orange` - Numbers, constants, warnings
+- `yellow` - Types, classes, search highlights
+- `green` - Strings, success states, git additions
+- `cyan` - Regex, escape sequences, support syntax
+- `blue` - Functions, keywords, info diagnostics
+- `purple` - Keywords, tags, storage classes
+- `magenta` - Special keywords, bold syntax elements
+- `teal` - Hints, support syntax
+
+**Special colors:**
+- `terminal_black` - Terminal black color
+- `special_char` - Escape sequences in strings (e.g., `\n`, `\t`)
+
+## Base16 Compatibility (Legacy)
+
+For backwards compatibility, base16 color names are still supported and automatically mapped:
+
+```lua
+colors = {
+    -- These base16 names still work and map to semantic colors
+    base00 = "#000000",  -- → bg (default background)
+    base01 = "#282828",  -- → terminal_black (lighter background)
+    base02 = "#383838",  -- → bg_highlight (selection background)
+    base03 = "#585858",  -- → comment, fg_gutter (comments, line numbers)
+    base04 = "#b8b8b8",  -- → fg_dark (dark foreground)
+    base05 = "#d8d8d8",  -- → fg (default foreground)
+    base08 = "#f92672",  -- → red (errors, variables)
+    base09 = "#fd971f",  -- → orange (numbers, constants)
+    base0A = "#f4bf75",  -- → yellow (types, classes)
+    base0B = "#a6e22e",  -- → green (strings)
+    base0C = "#66d9ef",  -- → cyan, teal (regex, escapes)
+    base0D = "#66d9ef",  -- → blue (functions, keywords)
+    base0E = "#ae81ff",  -- → purple, magenta (keywords, storage)
+    base0F = "#cc6633",  -- → special_char (escape sequences)
+}
+```
 
 ## Hot Reload
 
@@ -253,14 +264,6 @@ Hot reload automatically refreshes the theme when you edit plugin files or your 
 
 ```lua
 require("aether.hotreload").setup()
-```
-
-### With External Config Watching (Omarchy)
-
-```lua
-require("aether.hotreload").setup({
-    watch_external_config = "~/.config/omarchy/current/theme/neovim.lua"
-})
 ```
 
 ### Manual Reload
@@ -279,7 +282,7 @@ require("lualine").setup({
 })
 ```
 
-The lualine theme automatically uses your custom base16 colors.
+The lualine theme automatically uses your custom colors.
 
 ## Supported Plugins
 
@@ -327,9 +330,9 @@ You can create your own colorscheme variant with a custom name by creating a `co
 require("aether").load({
     name = "hackerman",
     colors = {
-        -- Your custom colors
-        base00 = "#000000",
-        base08 = "#00ff00",
+        bg = "#000000",
+        fg = "#00ff00",
+        green = "#00ff00",
         -- etc...
     },
 })
@@ -338,22 +341,6 @@ require("aether").load({
 Then use it like any other colorscheme:
 ```vim
 :colorscheme hackerman
-```
-
-Or with lazy.nvim:
-```lua
-{
-    "bjarneo/aether.nvim",
-    priority = 1000,
-}
-
--- In your LazyVim config:
-{
-    "LazyVim/LazyVim",
-    opts = {
-        colorscheme = "hackerman",
-    },
-}
 ```
 
 ## Examples
@@ -375,9 +362,9 @@ require("aether").setup({
 ```lua
 require("aether").setup({
     colors = {
-        base08 = "#ff5555",  -- Red
-        base0B = "#50fa7b",  -- Green
-        base0D = "#8be9fd",  -- Blue
+        red = "#ff5555",
+        green = "#50fa7b",
+        blue = "#8be9fd",
     },
 })
 ```
