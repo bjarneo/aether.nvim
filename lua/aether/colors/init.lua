@@ -130,9 +130,13 @@ function M.setup(opts)
 			colors.bg_dark = colors.bg_dark == default_palette.bg_dark and colors.bg or colors.bg_dark
 			colors.bg_dark1 = colors.bg_dark1 == default_palette.bg_dark1 and colors.bg or colors.bg_dark1
 		end
+		if opts.colors.fg_dark then
+			colors.dark5 = colors.dark5 == default_palette.dark5 and colors.fg_dark or colors.dark5
+		end
 		if opts.colors.comment then
 			colors.dark3 = colors.dark3 == default_palette.dark3 and colors.comment or colors.dark3
 			colors.fg_gutter = colors.fg_gutter == default_palette.fg_gutter and colors.comment or colors.fg_gutter
+			colors.terminal_black = colors.terminal_black == default_palette.terminal_black and colors.comment or colors.terminal_black
 		end
 		if opts.colors.red then
 			colors.red1 = colors.red1 == default_palette.red1 and colors.red or colors.red1
@@ -142,8 +146,12 @@ function M.setup(opts)
 			colors.green2 = colors.green2 == default_palette.green2 and colors.green or colors.green2
 		end
 		if opts.colors.blue then
+			colors.blue0 = colors.blue0 == default_palette.blue0 and colors.blue or colors.blue0
 			colors.blue1 = colors.blue1 == default_palette.blue1 and colors.blue or colors.blue1
 			colors.blue2 = colors.blue2 == default_palette.blue2 and colors.blue or colors.blue2
+			colors.blue5 = colors.blue5 == default_palette.blue5 and colors.blue or colors.blue5
+			colors.blue6 = colors.blue6 == default_palette.blue6 and colors.blue or colors.blue6
+			colors.blue7 = colors.blue7 == default_palette.blue7 and colors.blue or colors.blue7
 		end
 		if opts.colors.cyan then
 			colors.teal = colors.teal == default_palette.teal and colors.cyan or colors.teal

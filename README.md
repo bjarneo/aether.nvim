@@ -162,32 +162,30 @@ require("aether").setup({
     },
 
     -- Color customization (override any palette color)
+    -- These colors automatically propagate to their variants
     colors = {
         -- Background colors
-        bg = "#000000",            -- Default editor background
-        bg_dark = "#000000",       -- Darker background (sidebars, statusline)
-        bg_highlight = "#000000",  -- Highlighted lines (cursorline)
+        bg = "#000000",            -- Default background → bg_dark, bg_dark1
+        bg_dark = "#000000",       -- Sidebars, statusline (optional override)
+        bg_highlight = "#000000",  -- Cursorline, selection
 
         -- Foreground colors
         fg = "#d8d8d8",            -- Default text color
-        fg_dark = "#b8b8b8",       -- Darker text (statusline, inactive)
-        fg_gutter = "#585858",     -- Line numbers, fold column
-        comment = "#585858",       -- Comments
+        fg_dark = "#b8b8b8",       -- Statusline, inactive → dark5
+        comment = "#585858",       -- Comments → dark3, fg_gutter, terminal_black
 
-        -- Accent colors
-        red = "#f92672",           -- Errors, deletions, important syntax
-        orange = "#fd971f",        -- Numbers, constants, warnings
-        yellow = "#f4bf75",        -- Types, classes, search highlights
-        green = "#a6e22e",         -- Strings, success, git additions
-        cyan = "#66d9ef",          -- Regex, escape sequences
-        blue = "#66d9ef",          -- Functions, keywords, info
-        purple = "#ae81ff",        -- Keywords, tags, storage
-        magenta = "#ae81ff",       -- Special keywords, bold syntax
+        -- Accent colors (propagate to variants)
+        red = "#f92672",           -- Errors, deletions → red1
+        orange = "#fd971f",        -- Numbers, constants
+        yellow = "#f4bf75",        -- Types, classes
+        green = "#a6e22e",         -- Strings → green1, green2
+        cyan = "#66d9ef",          -- Regex, PreProc, Special → teal
+        blue = "#66d9ef",          -- Keywords, info → blue0-7
+        purple = "#ae81ff",        -- Keywords, tags → magenta
+        magenta = "#ae81ff",       -- Functions, identifiers → magenta2
 
-        -- Additional colors
-        teal = "#66d9ef",          -- Hints, support syntax
-        terminal_black = "#282828", -- Terminal black color
-        special_char = "#cc6633",  -- Escape sequences in strings
+        -- Optional: directly set if you want different values
+        special_char = "#cc6633",  -- Escape sequences (\n, \t)
     },
 
     -- Advanced: Customize derived colors
@@ -212,31 +210,25 @@ require("aether").setup({
 
 ## Color Reference
 
-**Background colors:**
-- `bg` - Default editor background
-- `bg_dark` - Darker background (sidebars, statusline, popups)
-- `bg_highlight` - Highlighted lines (cursorline)
+When you inject colors, they automatically propagate to their variants:
 
-**Foreground colors:**
-- `fg` - Default text color
-- `fg_dark` - Darker text (statusline, inactive windows)
-- `fg_gutter` - Line numbers, fold column, sign column
-- `comment` - Comments
+| Injected Color | Propagates To | Used For |
+|----------------|---------------|----------|
+| `bg` | `bg_dark`, `bg_dark1` | Editor background, sidebars |
+| `fg_dark` | `dark5` | Statusline, inactive text |
+| `comment` | `dark3`, `fg_gutter`, `terminal_black` | Comments, line numbers |
+| `red` | `red1` | Errors, git delete |
+| `green` | `green1`, `green2` | Strings, git add |
+| `blue` | `blue0`-`blue7` | Keywords, operators, info |
+| `cyan` | `teal` | Regex, PreProc, Special, hints |
+| `purple` | `magenta` | Keywords, tags |
+| `magenta` | `magenta2` | Functions, identifiers |
 
-**Accent colors:**
-- `red` - Errors, deletions, important syntax, variables
-- `orange` - Numbers, constants, warnings
-- `yellow` - Types, classes, search highlights
-- `green` - Strings, success states, git additions
-- `cyan` - Regex, escape sequences, support syntax
-- `blue` - Functions, keywords, info diagnostics
-- `purple` - Keywords, tags, storage classes
-- `magenta` - Special keywords, bold syntax elements
-- `teal` - Hints, support syntax
-
-**Special colors:**
-- `terminal_black` - Terminal black color
-- `special_char` - Escape sequences in strings (e.g., `\n`, `\t`)
+**All injectable colors:**
+- `bg`, `bg_dark`, `bg_highlight` - Backgrounds
+- `fg`, `fg_dark`, `comment` - Foregrounds
+- `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta` - Accents
+- `special_char` - Escape sequences in strings
 
 ## Base16 Compatibility (Legacy)
 
