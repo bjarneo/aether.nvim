@@ -1,6 +1,4 @@
 -- Noice plugin support for Aether colorscheme
-local Util = require("aether.utils")
-
 local M = {}
 
 ---@type aether.HighlightsFn

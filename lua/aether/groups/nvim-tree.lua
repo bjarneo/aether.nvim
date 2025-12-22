@@ -1,9 +1,5 @@
 -- Nvim-tree plugin support for Aether colorscheme
-local Util = require("aether.utils")
-
 local M = {}
-
-M.url = "https://github.com/kyazdani42/nvim-tree.lua"
 
 ---@type aether.HighlightsFn
 function M.get(c, opts)

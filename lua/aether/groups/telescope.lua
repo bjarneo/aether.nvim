@@ -1,6 +1,4 @@
 -- Telescope plugin support for Aether colorscheme
-local Util = require("aether.utils")
-
 local M = {}
 
 ---@type aether.HighlightsFn
@@ -31,11 +29,6 @@ function M.get(c, opts)
     
     TelescopeResultsDirectory = { fg = c.blue, bold = true },
   }
-end
-
-return M
-  hi("TelescopeResultsGitStatus", { fg = colors.base0A })
-  hi("TelescopeResultsGitBranch", { fg = colors.base0B })
 end
 
 return M

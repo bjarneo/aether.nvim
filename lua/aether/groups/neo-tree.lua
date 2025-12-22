@@ -3,8 +3,6 @@ local Util = require("aether.utils")
 
 local M = {}
 
-M.url = "https://github.com/nvim-neo-tree/neo-tree.nvim"
-
 ---@type aether.HighlightsFn
 function M.get(c, opts)
   local dark = opts.styles.sidebars == "transparent" and c.none
