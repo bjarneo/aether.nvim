@@ -1,46 +1,69 @@
---- Utility functions for the Aether colorscheme
+---@class aether.Util
 local M = {}
 
+---@type string Default background for blending
 M.bg = "#000000"
+---@type string Default foreground for blending
 M.fg = "#d8d8d8"
 
----@param c  string
-local function rgb(c)
-  c = string.lower(c)
-  return { tonumber(c:sub(2, 3), 16), tonumber(c:sub(4, 5), 16), tonumber(c:sub(6, 7), 16) }
+---Parse hex color to RGB components
+---@param hex string Hex color string (e.g., "#ff0000")
+---@return number[] RGB values as {r, g, b}
+local function hex_to_rgb(hex)
+  hex = hex:lower()
+  return {
+    tonumber(hex:sub(2, 3), 16),
+    tonumber(hex:sub(4, 5), 16),
+    tonumber(hex:sub(6, 7), 16),
+  }
 end
 
----@param foreground string foreground color
----@param background string background color
----@param alpha number|string number between 0 and 1. 0 results in bg, 1 results in fg
+---Blend two colors together
+---@param foreground string Foreground hex color
+---@param alpha number|string Blend factor (0-1, or hex string)
+---@param background string Background hex color
+---@return string Blended hex color
 function M.blend(foreground, alpha, background)
   alpha = type(alpha) == "string" and (tonumber(alpha, 16) / 0xff) or alpha
-  local bg = rgb(background)
-  local fg = rgb(foreground)
+  local bg = hex_to_rgb(background)
+  local fg = hex_to_rgb(foreground)
 
-  local blendChannel = function(i)
+  local function blend_channel(i)
     local ret = (alpha * fg[i] + ((1 - alpha) * bg[i]))
     return math.floor(math.min(math.max(0, ret), 255) + 0.5)
   end
 
-  return string.format("#%02x%02x%02x", blendChannel(1), blendChannel(2), blendChannel(3))
+  return string.format("#%02x%02x%02x", blend_channel(1), blend_channel(2), blend_channel(3))
 end
 
+---Blend color towards background (darken)
+---@param hex string Hex color to blend
+---@param amount number Blend amount (0-1)
+---@param bg? string Optional background color
+---@return string Blended hex color
 function M.blend_bg(hex, amount, bg)
   return M.blend(hex, amount, bg or M.bg)
 end
-M.darken = M.blend_bg
 
+---Blend color towards foreground (lighten)
+---@param hex string Hex color to blend
+---@param amount number Blend amount (0-1)
+---@param fg? string Optional foreground color
+---@return string Blended hex color
 function M.blend_fg(hex, amount, fg)
   return M.blend(hex, amount, fg or M.fg)
 end
+
+-- Aliases
+M.darken = M.blend_bg
 M.lighten = M.blend_fg
 
----@param groups aether.Highlights
+---Resolve style tables in highlight definitions
+---@param groups table<string, aether.Highlight> Highlight groups
 ---@return table<string, vim.api.keyset.highlight>
 function M.resolve(groups)
   for _, hl in pairs(groups) do
-    if type(hl.style) == "table" then
+    if type(hl) == "table" and type(hl.style) == "table" then
       for k, v in pairs(hl.style) do
         hl[k] = v
       end
@@ -48,48 +71,6 @@ function M.resolve(groups)
     end
   end
   return groups
-end
-
---- Helper function to set highlight groups with color values
---- This function builds a vim highlight command string and executes it
---- @param group string The highlight group name to set
---- @param opts table Table containing highlight options:
----   - fg: string Foreground color (hex color value)
----   - bg: string Background color (hex color value)
----   - sp: string Special color for underlines/undercurls (hex color value)
----   - style: string Style attributes (bold, italic, underline, etc.)
----   - blend: number Transparency level (0-100, where 0 is opaque and 100 is fully transparent)
-function M.hi(group, opts)
-  -- Start building the highlight command string
-  local cmd = "highlight " .. group
-
-  -- Add GUI foreground color if specified
-  if opts.fg then
-    cmd = cmd .. " guifg=" .. opts.fg
-  end
-
-  -- Add GUI background color if specified
-  if opts.bg then
-    cmd = cmd .. " guibg=" .. opts.bg
-  end
-
-  -- Add special color for underlines if specified
-  if opts.sp then
-    cmd = cmd .. " guisp=" .. opts.sp
-  end
-
-  -- Add style attributes (bold, italic, etc.) if specified
-  if opts.style then
-    cmd = cmd .. " gui=" .. opts.style
-  end
-
-  -- Add blend/transparency if specified
-  if opts.blend then
-    cmd = cmd .. " blend=" .. opts.blend
-  end
-
-  -- Execute the highlight command
-  vim.cmd(cmd)
 end
 
 return M

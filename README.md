@@ -199,8 +199,6 @@ require("aether").setup({
         hl.Comment = { fg = colors.comment, italic = true }
     end,
 
-    cache = true,                  -- Enable caching
-
     plugins = {
         all = package.loaded.lazy == nil,  -- Enable all when not using lazy.nvim
         auto = true,                       -- Auto-detect loaded plugins
@@ -387,13 +385,13 @@ Ensure true colors are enabled:
 vim.opt.termguicolors = true
 ```
 
-### Clear cache
+### Theme not applying
 
-```vim
-:lua require("aether").load({ cache = false })
+Make sure you call `vim.cmd.colorscheme("aether")` after `setup()`:
+```lua
+require("aether").setup({ ... })
+vim.cmd.colorscheme("aether")
 ```
-
-Or delete: `~/.cache/nvim/aether-*.json`
 
 ## License
 

@@ -2,257 +2,249 @@ local Util = require("aether.utils")
 
 local M = {}
 
----@class Palette
-local default_palette = {
-	-- Background colors
-	bg = "#000000",           -- Default background
-	bg_dark = "#000000",      -- Darker background (sidebars, statusline)
-	bg_dark1 = "#000000",     -- Even darker background
-	bg_highlight = "#000000", -- Highlighted lines (cursorline)
+---@class aether.Palette
+---@field bg string Background color
+---@field bg_dark string Darker background (sidebars)
+---@field bg_dark1 string Even darker background
+---@field bg_highlight string Highlighted lines (cursorline)
+---@field fg string Default foreground
+---@field fg_dark string Darker foreground
+---@field fg_gutter string Line numbers, fold column
+---@field comment string Comments
+---@field blue string Primary blue accent
+---@field cyan string Cyan accent
+---@field green string Green (strings, success)
+---@field magenta string Magenta accent
+---@field orange string Orange (numbers, warnings)
+---@field purple string Purple (keywords)
+---@field red string Red (errors)
+---@field teal string Teal accent
+---@field yellow string Yellow (types)
+local palette = {
+  -- Background colors
+  bg = "#000000",
+  bg_dark = "#000000",
+  bg_dark1 = "#000000",
+  bg_highlight = "#000000",
 
-	-- Primary accent colors
-	blue = "#66d9ef",         -- Functions, keywords, info diagnostics
-	blue0 = "#264f78",        -- Search background, visual selection base
-	blue1 = "#66d9ef",        -- Links, special syntax
-	blue2 = "#66d9ef",        -- Info diagnostics
-	blue5 = "#89ddff",        -- Lighter blue accents
-	blue6 = "#b4f9f8",        -- Brightest blue accents
-	blue7 = "#1e3a5f",        -- Diff change background base
+  -- Primary accent colors
+  blue = "#66d9ef",
+  blue0 = "#264f78",
+  blue1 = "#66d9ef",
+  blue2 = "#66d9ef",
+  blue5 = "#89ddff",
+  blue6 = "#b4f9f8",
+  blue7 = "#1e3a5f",
 
-	-- Neutral colors
-	comment = "#585858",      -- Comments
-	cyan = "#66d9ef",         -- Regex, escape sequences
+  -- Neutral colors
+  comment = "#585858",
+  cyan = "#66d9ef",
+  dark3 = "#585858",
+  dark5 = "#b8b8b8",
 
-	dark3 = "#585858",        -- Non-text, special keys
-	dark5 = "#b8b8b8",        -- Conceal, dark foreground
+  -- Foreground colors
+  fg = "#d8d8d8",
+  fg_dark = "#b8b8b8",
+  fg_gutter = "#585858",
 
-	-- Foreground colors
-	fg = "#d8d8d8",           -- Default foreground text
-	fg_dark = "#b8b8b8",      -- Darker foreground (statusline, inactive)
-	fg_gutter = "#585858",    -- Line numbers, fold column
+  -- Semantic colors
+  green = "#a6e22e",
+  green1 = "#a6e22e",
+  green2 = "#73aa6a",
 
-	-- Semantic colors
-	green = "#a6e22e",        -- Strings, success, git additions
-	green1 = "#a6e22e",       -- String variants
-	green2 = "#73aa6a",       -- Git add, diff add
+  magenta = "#ae81ff",
+  magenta2 = "#ae81ff",
 
-	magenta = "#ae81ff",      -- Storage, special keywords
-	magenta2 = "#ae81ff",     -- Functions, identifiers
+  orange = "#fd971f",
+  purple = "#ae81ff",
 
-	orange = "#fd971f",       -- Numbers, constants, warnings
-	purple = "#ae81ff",       -- Keywords, tags
+  red = "#f92672",
+  red1 = "#c91f4f",
 
-	red = "#f92672",          -- Errors, deletions, important
-	red1 = "#c91f4f",         -- Git delete, diff delete
+  teal = "#66d9ef",
+  terminal_black = "#282828",
+  yellow = "#f4bf75",
 
-	teal = "#66d9ef",         -- Hints, support
-	terminal_black = "#282828", -- Terminal black, lighter backgrounds
-
-	yellow = "#f4bf75",       -- Types, classes, warnings
-
-	-- Git colors will be calculated from the palette colors above
-	git = {},
-
-	special_char = "#cc6633", -- Escape sequences, special characters
+  special_char = "#cc6633",
 }
 
----@param opts? aether.Config
+---@type table<string, string|string[]> Base16 to semantic color mapping
+local base16_map = {
+  base00 = { "bg", "bg_dark", "bg_dark1" },
+  base01 = "terminal_black",
+  base02 = "bg_highlight",
+  base03 = { "comment", "dark3", "fg_gutter" },
+  base04 = { "dark5", "fg_dark" },
+  base05 = "fg",
+  base08 = { "red", "red1", "magenta2" },
+  base09 = "orange",
+  base0A = "yellow",
+  base0B = { "green", "green1", "green2" },
+  base0C = { "cyan", "teal" },
+  base0D = { "blue", "blue1", "blue2" },
+  base0E = { "purple", "magenta" },
+  base0F = "special_char",
+}
+
+---@type table<string, string[]> Color propagation rules (source -> variants)
+local propagation = {
+  bg = { "bg_dark", "bg_dark1" },
+  fg_dark = { "dark5" },
+  comment = { "dark3", "fg_gutter", "terminal_black" },
+  red = { "red1" },
+  green = { "green1", "green2" },
+  blue = { "blue0", "blue1", "blue2", "blue5", "blue6", "blue7" },
+  cyan = { "teal" },
+  magenta = { "magenta2" },
+  purple = { "magenta" },
+}
+
+---Apply base16 color mappings
+---@param colors aether.Palette Colors to modify
+---@param opts_colors table User color overrides
+local function apply_base16(colors, opts_colors)
+  for base_key, targets in pairs(base16_map) do
+    local value = opts_colors[base_key]
+    if value then
+      if type(targets) == "string" then
+        colors[targets] = value
+      else
+        for _, target in ipairs(targets) do
+          colors[target] = value
+        end
+      end
+    end
+  end
+end
+
+---Apply color propagation rules
+---@param colors aether.Palette Colors to modify
+---@param opts_colors table User color overrides
+local function apply_propagation(colors, opts_colors)
+  for source, variants in pairs(propagation) do
+    if opts_colors[source] then
+      for _, variant in ipairs(variants) do
+        -- Only propagate if variant wasn't explicitly set
+        if colors[variant] == palette[variant] then
+          colors[variant] = colors[source]
+        end
+      end
+    end
+  end
+end
+
+---Setup the color palette
+---@param opts aether.Config
+---@return ColorScheme
 function M.setup(opts)
-	opts = require("aether.config").extend(opts)
+  opts = require("aether.config").extend(opts)
 
-	-- Color Palette
-	---@class ColorScheme: Palette
-	local colors = vim.deepcopy(default_palette)
+  ---@class ColorScheme: aether.Palette
+  local colors = vim.deepcopy(palette)
 
-	if opts.colors and next(opts.colors) then
-		-- Backwards compatibility: map base16 colors to semantic names
-		if opts.colors.base00 then
-			colors.bg = opts.colors.base00
-			colors.bg_dark = opts.colors.base00
-			colors.bg_dark1 = opts.colors.base00
-		end
-		if opts.colors.base01 then
-			colors.terminal_black = opts.colors.base01
-		end
-		if opts.colors.base02 then
-			colors.bg_highlight = opts.colors.base02
-		end
-		if opts.colors.base03 then
-			colors.comment = opts.colors.base03
-			colors.dark3 = opts.colors.base03
-			colors.fg_gutter = opts.colors.base03
-		end
-		if opts.colors.base04 then
-			colors.dark5 = opts.colors.base04
-			colors.fg_dark = opts.colors.base04
-		end
-		if opts.colors.base05 then
-			colors.fg = opts.colors.base05
-		end
-		if opts.colors.base08 then
-			colors.red = opts.colors.base08
-			colors.red1 = opts.colors.base08
-			colors.magenta2 = opts.colors.base08
-		end
-		if opts.colors.base09 then
-			colors.orange = opts.colors.base09
-		end
-		if opts.colors.base0A then
-			colors.yellow = opts.colors.base0A
-		end
-		if opts.colors.base0B then
-			colors.green = opts.colors.base0B
-			colors.green1 = opts.colors.base0B
-			colors.green2 = opts.colors.base0B
-		end
-		if opts.colors.base0C then
-			colors.cyan = opts.colors.base0C
-			colors.teal = opts.colors.base0C
-		end
-		if opts.colors.base0D then
-			colors.blue = opts.colors.base0D
-			colors.blue1 = opts.colors.base0D
-			colors.blue2 = opts.colors.base0D
-		end
-		if opts.colors.base0E then
-			colors.purple = opts.colors.base0E
-			colors.magenta = opts.colors.base0E
-		end
-		if opts.colors.base0F then
-			colors.special_char = opts.colors.base0F
-		end
+  -- Apply user color overrides
+  if opts.colors and next(opts.colors) then
+    apply_base16(colors, opts.colors)
+    colors = vim.tbl_deep_extend("force", colors, opts.colors)
+    apply_propagation(colors, opts.colors)
+  end
 
-		-- Apply direct semantic overrides
-		colors = vim.tbl_deep_extend("force", colors, opts.colors)
+  -- Update Util defaults for blending
+  Util.bg = colors.bg
+  Util.fg = colors.fg
 
-		-- Propagate injected semantic colors to their variants
-		if opts.colors.bg then
-			colors.bg_dark = colors.bg_dark == default_palette.bg_dark and colors.bg or colors.bg_dark
-			colors.bg_dark1 = colors.bg_dark1 == default_palette.bg_dark1 and colors.bg or colors.bg_dark1
-		end
-		if opts.colors.fg_dark then
-			colors.dark5 = colors.dark5 == default_palette.dark5 and colors.fg_dark or colors.dark5
-		end
-		if opts.colors.comment then
-			colors.dark3 = colors.dark3 == default_palette.dark3 and colors.comment or colors.dark3
-			colors.fg_gutter = colors.fg_gutter == default_palette.fg_gutter and colors.comment or colors.fg_gutter
-			colors.terminal_black = colors.terminal_black == default_palette.terminal_black and colors.comment or colors.terminal_black
-		end
-		if opts.colors.red then
-			colors.red1 = colors.red1 == default_palette.red1 and colors.red or colors.red1
-		end
-		if opts.colors.green then
-			colors.green1 = colors.green1 == default_palette.green1 and colors.green or colors.green1
-			colors.green2 = colors.green2 == default_palette.green2 and colors.green or colors.green2
-		end
-		if opts.colors.blue then
-			colors.blue0 = colors.blue0 == default_palette.blue0 and colors.blue or colors.blue0
-			colors.blue1 = colors.blue1 == default_palette.blue1 and colors.blue or colors.blue1
-			colors.blue2 = colors.blue2 == default_palette.blue2 and colors.blue or colors.blue2
-			colors.blue5 = colors.blue5 == default_palette.blue5 and colors.blue or colors.blue5
-			colors.blue6 = colors.blue6 == default_palette.blue6 and colors.blue or colors.blue6
-			colors.blue7 = colors.blue7 == default_palette.blue7 and colors.blue or colors.blue7
-		end
-		if opts.colors.cyan then
-			colors.teal = colors.teal == default_palette.teal and colors.cyan or colors.teal
-		end
-		if opts.colors.magenta then
-			colors.magenta2 = colors.magenta2 == default_palette.magenta2 and colors.magenta or colors.magenta2
-		end
-		if opts.colors.purple then
-			colors.magenta = colors.magenta == default_palette.magenta and colors.purple or colors.magenta
-		end
-	end
+  colors.none = "NONE"
 
-	Util.bg = colors.bg
-	Util.fg = colors.fg
+  -- Git colors (derived from theme)
+  colors.git = {
+    add = colors.green2,
+    delete = colors.red1,
+    change = colors.orange,
+    ignore = colors.dark3,
+  }
 
-	colors.none = "NONE"
+  -- Diff colors (blended backgrounds)
+  colors.diff = {
+    add = Util.blend_bg(colors.green2, 0.25),
+    delete = Util.blend_bg(colors.red1, 0.25),
+    change = Util.blend_bg(colors.blue7, 0.15),
+    text = colors.blue7,
+  }
 
-	-- Always update git colors to use the palette colors (either default or injected)
-	-- This ensures git colors are derived from the theme colors
-	colors.git.add = colors.green2 or colors.green
-	colors.git.delete = colors.red1 or colors.red
-	colors.git.change = colors.orange or colors.yellow
+  -- Derived colors
+  colors.black = Util.blend_bg(colors.bg, 0.8, colors.bg)
+  colors.border_highlight = Util.blend_bg(colors.blue1, 0.8)
+  colors.border = colors.black
 
-	-- Diff colors using tokyonight approach
-	colors.diff = {
-		add = Util.blend_bg(colors.green2 or colors.green, 0.25),
-		delete = Util.blend_bg(colors.red1 or colors.red, 0.25),
-		change = Util.blend_bg(colors.blue7 or colors.blue, 0.15),
-		text = colors.blue7 or colors.blue,
-	}
+  -- UI backgrounds
+  colors.bg_popup = colors.bg_dark
+  colors.bg_statusline = colors.bg_dark
 
-	colors.git.ignore = colors.dark3
-	colors.black = Util.blend_bg(colors.bg, 0.8, colors.bg)
-	colors.border_highlight = Util.blend_bg(colors.blue1, 0.8)
-	colors.border = colors.black
+  colors.bg_sidebar = opts.styles.sidebars == "transparent" and colors.none
+    or opts.styles.sidebars == "dark" and colors.bg_dark
+    or colors.bg
 
-	-- Popups and statusline always get a dark background
-	colors.bg_popup = colors.bg_dark
-	colors.bg_statusline = colors.bg_dark
+  colors.bg_float = opts.styles.floats == "transparent" and colors.none
+    or opts.styles.floats == "dark" and colors.bg_dark
+    or colors.bg
 
-	-- Sidebar and Floats are configurable
-	colors.bg_sidebar = opts.styles.sidebars == "transparent" and colors.none
-		or opts.styles.sidebars == "dark" and colors.bg_dark
-		or colors.bg
+  -- Selection and search
+  colors.bg_visual = Util.blend_bg(colors.blue0, 0.4)
+  colors.bg_search = colors.blue0
+  colors.fg_sidebar = colors.fg
+  colors.fg_float = colors.fg
 
-	colors.bg_float = opts.styles.floats == "transparent" and colors.none
-		or opts.styles.floats == "dark" and colors.bg_dark
-		or colors.bg
+  -- Diagnostics
+  colors.error = colors.red1
+  colors.warning = colors.yellow
+  colors.info = colors.blue2
+  colors.hint = colors.teal
+  colors.todo = colors.blue
 
-	colors.bg_visual = Util.blend_bg(colors.blue0, 0.4)
-	colors.bg_search = colors.blue0
-	colors.fg_sidebar = colors.fg
-	colors.fg_float = colors.fg
+  -- Subtle highlights
+  colors.subtle_bg = Util.blend_bg(colors.fg, 0.10)
+  colors.cursorline_bg = Util.blend_bg(colors.fg, 0.20)
+  colors.selection_bg = Util.blend_bg(colors.fg, 0.25)
+  colors.float_bg = Util.blend_bg(colors.fg, 0.12)
 
-	colors.error = colors.red1
-	colors.todo = colors.blue
-	colors.warning = colors.yellow
-	colors.info = colors.blue2
-	colors.hint = colors.teal
+  -- Rainbow colors (for indent guides, etc.)
+  colors.rainbow = {
+    colors.blue,
+    colors.yellow,
+    colors.green,
+    colors.teal,
+    colors.magenta,
+    colors.purple,
+    colors.orange,
+    colors.red,
+  }
 
-	-- Create blended colors for subtle highlights
-	colors.subtle_bg = Util.blend_bg(colors.fg, 0.10)
-	colors.cursorline_bg = Util.blend_bg(colors.fg, 0.20)
-	colors.selection_bg = Util.blend_bg(colors.fg, 0.25)
-	colors.float_bg = Util.blend_bg(colors.fg, 0.12)
+  -- Terminal colors
+  colors.terminal = {
+    black = colors.black,
+    black_bright = colors.terminal_black,
+    red = colors.red,
+    red_bright = colors.red,
+    green = colors.green,
+    green_bright = colors.green,
+    yellow = colors.yellow,
+    yellow_bright = colors.yellow,
+    blue = colors.blue,
+    blue_bright = colors.blue,
+    magenta = colors.magenta,
+    magenta_bright = colors.magenta,
+    cyan = colors.cyan,
+    cyan_bright = colors.cyan,
+    white = colors.fg_dark,
+    white_bright = colors.fg,
+  }
 
-	colors.rainbow = {
-		colors.blue,
-		colors.yellow,
-		colors.green,
-		colors.teal,
-		colors.magenta,
-		colors.purple,
-		colors.orange,
-		colors.red,
-	}
+  -- User callback
+  if opts.on_colors then
+    opts.on_colors(colors)
+  end
 
-	-- Terminal colors
-	colors.terminal = {
-		black = colors.black,
-		black_bright = colors.terminal_black,
-		red = colors.red,
-		red_bright = colors.red,
-		green = colors.green,
-		green_bright = colors.green,
-		yellow = colors.yellow,
-		yellow_bright = colors.yellow,
-		blue = colors.blue,
-		blue_bright = colors.blue,
-		magenta = colors.magenta,
-		magenta_bright = colors.magenta,
-		cyan = colors.cyan,
-		cyan_bright = colors.cyan,
-		white = colors.fg_dark,
-		white_bright = colors.fg,
-	}
-
-	-- Call user's on_colors callback for further customization
-	opts.on_colors(colors)
-
-	return colors, opts
+  return colors
 end
 
 return M

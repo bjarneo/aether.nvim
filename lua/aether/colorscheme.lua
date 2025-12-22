@@ -1,22 +1,17 @@
--- Aether colorscheme colors for use by external tools like lualine
--- This module provides access to the currently active color palette
-
+---Provides color access for external tools (lualine, etc.)
+---@class aether.ColorScheme
 local M = {}
 
--- Get the current color palette
+---Get the current color palette
+---@return ColorScheme
 function M.get()
-  local config = require("aether.config")
-  local colors_module = require("aether.colors")
-  local opts = config.extend()
-  return colors_module.setup(opts)
+  local opts = require("aether.config").extend()
+  return require("aether.colors").setup(opts)
 end
 
--- For compatibility with simple require() calls
-setmetatable(M, {
+-- Allow direct color access via metatable
+return setmetatable(M, {
   __index = function(_, key)
-    local colors = M.get()
-    return colors[key]
-  end
+    return M.get()[key]
+  end,
 })
-
-return M

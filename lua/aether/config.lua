@@ -1,48 +1,53 @@
+---@class aether.Config
+---@field name? string Colorscheme name
+---@field transparent? boolean Disable background color
+---@field terminal_colors? boolean Configure terminal colors
+---@field styles? aether.Styles Syntax styling options
+---@field dim_inactive? boolean Dim inactive windows
+---@field lualine_bold? boolean Bold lualine section headers
+---@field colors? table<string, string> Color overrides
+---@field on_colors? fun(colors: ColorScheme) Callback to modify colors
+---@field on_highlights? fun(highlights: aether.Highlights, colors: ColorScheme) Callback to modify highlights
+---@field plugins? aether.Plugins Plugin configuration
+
+---@class aether.Styles
+---@field comments? vim.api.keyset.highlight Comment style
+---@field keywords? vim.api.keyset.highlight Keyword style
+---@field functions? vim.api.keyset.highlight Function style
+---@field variables? vim.api.keyset.highlight Variable style
+---@field sidebars? "dark"|"transparent"|"normal" Sidebar style
+---@field floats? "dark"|"transparent"|"normal" Float style
+
+---@class aether.Plugins
+---@field all? boolean Enable all plugins
+---@field auto? boolean Auto-detect plugins
+
+---@alias aether.Highlight vim.api.keyset.highlight|string
+---@alias aether.Highlights table<string, aether.Highlight>
+---@alias aether.HighlightsFn fun(colors: ColorScheme, opts: aether.Config): aether.Highlights
+
 local M = {}
 
----@class aether.Config
----@field on_colors fun(colors: ColorScheme)
----@field on_highlights fun(highlights: aether.Highlights, colors: ColorScheme)
+---@type aether.Config
 M.defaults = {
-  name = "aether", -- The name of the colorscheme (useful for creating variants)
-  transparent = false, -- Enable this to disable setting the background color
-  terminal_colors = true, -- Configure the colors used when opening a `:terminal` in Neovim
+  name = "aether",
+  transparent = false,
+  terminal_colors = true,
   styles = {
-    -- Style to be applied to different syntax groups
-    -- Value is any valid attr-list value for `:help nvim_set_hl`
     comments = { italic = true },
     keywords = { italic = true },
     functions = {},
     variables = {},
-    -- Background styles. Can be "dark", "transparent" or "normal"
-    sidebars = "dark", -- style for sidebars, see below
-    floats = "dark", -- style for floating windows
+    sidebars = "dark",
+    floats = "dark",
   },
-  dim_inactive = false, -- dims inactive windows
-  lualine_bold = false, -- When `true`, section headers in the lualine theme will be bold
-
+  dim_inactive = false,
+  lualine_bold = false,
   colors = {},
-
-  --- You can override specific color groups to use other groups or a hex color
-  --- function will be called with a ColorScheme table
-  ---@param colors ColorScheme
-  on_colors = function(colors) end,
-
-  --- You can override specific highlights to use other groups or a hex color
-  --- function will be called with a Highlights and ColorScheme table
-  ---@param highlights aether.Highlights
-  ---@param colors ColorScheme
-  on_highlights = function(highlights, colors) end,
-
-  cache = true, -- When set to true, the theme will be cached for better performance
-
-  ---@type table<string, boolean|{enabled:boolean}>
+  on_colors = function() end,
+  on_highlights = function() end,
   plugins = {
-    -- enable all plugins when not using lazy.nvim
-    -- set to false to manually enable/disable plugins
     all = package.loaded.lazy == nil,
-    -- uses your plugin manager to automatically enable needed plugins
-    -- currently only lazy.nvim is supported
     auto = true,
   },
 }
@@ -50,14 +55,17 @@ M.defaults = {
 ---@type aether.Config
 M.options = nil
 
+---Configure aether
 ---@param options? aether.Config
 function M.setup(options)
   M.options = vim.tbl_deep_extend("force", {}, M.defaults, options or {})
 end
 
+---Extend current options with overrides
 ---@param opts? aether.Config
+---@return aether.Config
 function M.extend(opts)
-  return opts and vim.tbl_deep_extend("force", {}, M.options, opts) or M.options
+  return opts and vim.tbl_deep_extend("force", {}, M.options or M.defaults, opts) or M.options or M.defaults
 end
 
 setmetatable(M, {
