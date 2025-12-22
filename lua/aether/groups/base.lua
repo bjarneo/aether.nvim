@@ -6,7 +6,7 @@ local M = {}
 function M.get(c, opts)
   -- stylua: ignore
   return {
-    Comment                     = { fg = c.comment, style = opts.styles.comments }, -- any comment
+    Comment                     = { fg = c.green, style = opts.styles.comments }, -- any comment
     ColorColumn                 = { bg = c.black }, -- used for the columns set with 'colorcolumn'
     Conceal                     = { fg = c.dark5 }, -- placeholder characters substituted for concealed text
     Cursor                      = { fg = c.bg, bg = c.fg }, -- character under the cursor
@@ -81,7 +81,7 @@ function M.get(c, opts)
     Boolean                     = { fg = c.orange },
     Float                       = { fg = c.orange },
     Identifier                  = { fg = c.magenta2, style = opts.styles.variables },
-    Function                    = { fg = c.magenta2, bold = true, style = opts.styles.functions },
+    Function                    = { fg = c.blue, bold = true, style = opts.styles.functions },
     Statement                   = { fg = c.blue, bold = true },
     Conditional                 = { fg = c.purple },
     Repeat                      = { fg = c.purple },
