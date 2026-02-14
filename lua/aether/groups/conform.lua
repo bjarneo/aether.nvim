@@ -7,7 +7,7 @@ function M.get(c, opts)
   return {
     ConformProgress = { fg = c.blue },
     ConformDone     = { fg = c.green },
-    ConformError    = { fg = c.error },
+    ConformError    = { fg = c.bright_red },
   }
 end
 

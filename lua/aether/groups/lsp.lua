@@ -8,19 +8,19 @@ function M.get(c, opts)
   -- stylua: ignore
   return {
     -- Diagnostics
-    DiagnosticError                  = { fg = c.error },
+    DiagnosticError                  = { fg = c.bright_red },
     DiagnosticWarn                   = { fg = c.warning },
     DiagnosticInfo                   = { fg = c.info },
     DiagnosticHint                   = { fg = c.hint },
-    DiagnosticVirtualTextError       = { fg = c.error, bg = Util.blend_bg(c.error, 0.1) },
+    DiagnosticVirtualTextError       = { fg = c.bright_red, bg = Util.blend_bg(c.error, 0.1) },
     DiagnosticVirtualTextWarn        = { fg = c.warning, bg = Util.blend_bg(c.warning, 0.1) },
-    DiagnosticVirtualTextInfo        = { fg = c.info, bg = Util.blend_bg(c.info, 0.1) },
+    DiagnosticVirtualTextInfo        = { fg = c.bright_blue, bg = Util.blend_bg(c.info, 0.1) },
     DiagnosticVirtualTextHint        = { fg = c.hint, bg = Util.blend_bg(c.hint, 0.1) },
     DiagnosticUnderlineError         = { undercurl = true, sp = c.error },
     DiagnosticUnderlineWarn          = { undercurl = true, sp = c.warning },
     DiagnosticUnderlineInfo          = { undercurl = true, sp = c.info },
     DiagnosticUnderlineHint          = { undercurl = true, sp = c.hint },
-    
+
     -- LSP Semantic Tokens
     ["@lsp.type.class"]              = { link = "Structure" },
     ["@lsp.type.decorator"]          = { link = "Function" },
@@ -35,16 +35,16 @@ function M.get(c, opts)
     ["@lsp.type.property"]           = { link = "Identifier" },
     ["@lsp.type.struct"]             = { link = "Structure" },
     ["@lsp.type.type"]               = { link = "Type" },
-    ["@lsp.type.typeParameter"]      = { link = "TypeDef" },
+    ["@lsp.type.typeParameter"]      = { link = "Typedef" },
     ["@lsp.type.variable"]           = { link = "Identifier" },
-    
+
     -- LSP References and Definitions
-    LspReferenceText                 = { bg = c.bg_highlight },
-    LspReferenceRead                 = { bg = c.bg_highlight },
-    LspReferenceWrite                = { bg = c.bg_highlight, bold = true },
+    LspReferenceText                 = { bg = c.lighter_bg },
+    LspReferenceRead                 = { bg = c.lighter_bg },
+    LspReferenceWrite                = { bg = c.lighter_bg, bold = true },
     LspSignatureActiveParameter      = { fg = c.orange, bold = true },
-    LspCodeLens                      = { fg = c.comment },
-    LspInlayHint                     = { fg = c.comment, bg = Util.blend_bg(c.comment, 0.1) },
+    LspCodeLens                      = { fg = c.muted },
+    LspInlayHint                     = { fg = c.muted, bg = Util.blend_bg(c.muted, 0.1) },
   }
 end
 

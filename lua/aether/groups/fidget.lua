@@ -5,7 +5,7 @@ local M = {}
 function M.get(c, opts)
   -- stylua: ignore
   return {
-    FidgetTask = { fg = c.comment },
+    FidgetTask = { fg = c.muted },
     FidgetTitle = { fg = c.blue, bold = true },
   }
 end

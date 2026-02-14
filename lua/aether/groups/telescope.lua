@@ -5,28 +5,28 @@ local M = {}
 function M.get(c, opts)
   -- stylua: ignore
   return {
-    TelescopeSelection        = { fg = c.fg, bg = c.bg_highlight },
-    TelescopeSelectionCaret   = { fg = c.fg, bg = c.bg_highlight },
-    TelescopeMultiSelection   = { fg = c.fg, bg = c.bg_highlight },
+    TelescopeSelection        = { fg = c.fg, bg = c.lighter_bg },
+    TelescopeSelectionCaret   = { fg = c.fg, bg = c.lighter_bg },
+    TelescopeMultiSelection   = { fg = c.fg, bg = c.lighter_bg },
     TelescopeNormal           = "NormalFloat",
     TelescopeBorder           = "FloatBorder",
     TelescopeMatching         = { fg = c.cyan, bold = true },
-    
+
     TelescopePromptNormal     = { bg = c.bg_popup },
     TelescopePromptBorder     = { fg = c.border_highlight, bg = c.bg_popup },
     TelescopePromptTitle      = { fg = c.blue, bold = true },
     TelescopePromptPrefix     = { fg = c.fg },
-    
+
     TelescopePreviewNormal    = "NormalFloat",
     TelescopePreviewBorder    = "FloatBorder",
     TelescopePreviewTitle     = { fg = c.blue, bold = true },
-    TelescopePreviewLine      = { bg = c.bg_highlight },
-    TelescopePreviewMatch     = { fg = c.cyan, bg = c.bg_highlight },
-    
+    TelescopePreviewLine      = { bg = c.lighter_bg },
+    TelescopePreviewMatch     = { fg = c.cyan, bg = c.lighter_bg },
+
     TelescopeResultsNormal    = "NormalFloat",
     TelescopeResultsBorder    = "FloatBorder",
-    TelescopeResultsTitle     = { fg = c.red, bold = true },
-    
+    TelescopeResultsTitle     = { fg = c.bright_red, bold = true },
+
     TelescopeResultsDirectory = { fg = c.blue, bold = true },
   }
 end

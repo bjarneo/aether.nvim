@@ -3,135 +3,70 @@ local Util = require("aether.utils")
 local M = {}
 
 ---@class aether.Palette
----@field bg string Background color
----@field bg_dark string Darker background (sidebars)
----@field bg_dark1 string Even darker background
----@field bg_highlight string Highlighted lines (cursorline)
----@field fg string Default foreground
----@field fg_dark string Darker foreground
----@field fg_gutter string Line numbers, fold column
----@field comment string Comments
----@field blue string Primary blue accent
----@field cyan string Cyan accent
----@field green string Green (strings, success)
----@field magenta string Magenta accent
----@field orange string Orange (numbers, warnings)
----@field purple string Purple (keywords)
----@field red string Red (errors)
----@field teal string Teal accent
----@field yellow string Yellow (types)
+---@field accent string Primary accent
+---@field cursor string Cursor color
+---@field foreground string Foreground alias
+---@field background string Background alias
+---@field selection_foreground string Selection foreground
+---@field selection_background string Selection background
+---@field bg string Main background
+---@field lighter_bg string Highlighted lines, cursorline
+---@field selection string Visual selection
+---@field muted string Comments, line numbers, muted text
+---@field dark_fg string Secondary text, dark foreground
+---@field fg string Main foreground
+---@field light_fg string Light foreground
+---@field bright_fg string Brightest foreground
+---@field red string Red
+---@field yellow string Yellow
+---@field orange string Orange
+---@field green string Green
+---@field cyan string Cyan
+---@field blue string Blue
+---@field purple string Purple
+---@field brown string Brown, escape sequences
+---@field dark_bg string Darker background, sidebars
+---@field darker_bg string Darkest background
+---@field bright_red string Bright red
+---@field bright_yellow string Bright yellow
+---@field bright_green string Bright green
+---@field bright_cyan string Bright cyan
+---@field bright_blue string Bright blue
+---@field bright_purple string Bright purple
 local palette = {
-  -- Background colors
-  bg = "#000000",
-  bg_dark = "#000000",
-  bg_dark1 = "#000000",
-  bg_highlight = "#000000",
+  accent = "#ad523c",
+  cursor = "#a2aebb",
+  foreground = "#a2aebb",
+  background = "#1a1d24",
+  selection_foreground = "#dfe6eb",
+  selection_background = "#4a5366",
 
-  -- Primary accent colors
-  blue = "#66d9ef",
-  blue0 = "#264f78",
-  blue1 = "#66d9ef",
-  blue2 = "#66d9ef",
-  blue5 = "#89ddff",
-  blue6 = "#b4f9f8",
-  blue7 = "#1e3a5f",
+  bg = "#1a1d24",
+  lighter_bg = "#242830",
+  selection = "#2c3040",
+  muted = "#4a5366",
+  dark_fg = "#6b7688",
+  fg = "#a2aebb",
+  light_fg = "#c0ccd5",
+  bright_fg = "#dfe6eb",
 
-  -- Neutral colors
-  comment = "#585858",
-  cyan = "#66d9ef",
-  dark3 = "#585858",
-  dark5 = "#b8b8b8",
-
-  -- Foreground colors
-  fg = "#d8d8d8",
-  fg_dark = "#b8b8b8",
-  fg_gutter = "#585858",
-
-  -- Semantic colors
-  green = "#a6e22e",
-  green1 = "#a6e22e",
-  green2 = "#73aa6a",
-
-  magenta = "#ae81ff",
-  magenta2 = "#ae81ff",
-
-  orange = "#fd971f",
-  purple = "#ae81ff",
-
-  red = "#f92672",
-  red1 = "#c91f4f",
-
-  teal = "#66d9ef",
-  terminal_black = "#282828",
-  yellow = "#f4bf75",
-
-  special_char = "#cc6633",
+  red = "#ad523c",
+  yellow = "#d4a05a",
+  orange = "#c47a4e",
+  green = "#5e9a7e",
+  cyan = "#5b9ea0",
+  blue = "#5a8faa",
+  purple = "#8b6e9e",
+  brown = "#7d5440",
+  dark_bg = "#13161c",
+  darker_bg = "#0e1015",
+  bright_red = "#c46e5a",
+  bright_yellow = "#e0b87a",
+  bright_green = "#7eb89a",
+  bright_cyan = "#7ebcbe",
+  bright_blue = "#7aaac2",
+  bright_purple = "#a68eba",
 }
-
----@type table<string, string|string[]> Base16 to semantic color mapping
-local base16_map = {
-  base00 = { "bg", "bg_dark", "bg_dark1" },
-  base01 = "terminal_black",
-  base02 = "bg_highlight",
-  base03 = { "comment", "dark3", "fg_gutter" },
-  base04 = { "dark5", "fg_dark" },
-  base05 = "fg",
-  base08 = { "red", "red1", "magenta2" },
-  base09 = "orange",
-  base0A = "yellow",
-  base0B = { "green", "green1", "green2" },
-  base0C = { "cyan", "teal" },
-  base0D = { "blue", "blue1", "blue2" },
-  base0E = { "purple", "magenta" },
-  base0F = "special_char",
-}
-
----@type table<string, string[]> Color propagation rules (source -> variants)
-local propagation = {
-  bg = { "bg_dark", "bg_dark1" },
-  fg_dark = { "dark5" },
-  comment = { "dark3", "fg_gutter", "terminal_black" },
-  red = { "red1" },
-  green = { "green1", "green2" },
-  blue = { "blue0", "blue1", "blue2", "blue5", "blue6", "blue7" },
-  cyan = { "teal" },
-  magenta = { "magenta2" },
-  purple = { "magenta" },
-}
-
----Apply base16 color mappings
----@param colors aether.Palette Colors to modify
----@param opts_colors table User color overrides
-local function apply_base16(colors, opts_colors)
-  for base_key, targets in pairs(base16_map) do
-    local value = opts_colors[base_key]
-    if value then
-      if type(targets) == "string" then
-        colors[targets] = value
-      else
-        for _, target in ipairs(targets) do
-          colors[target] = value
-        end
-      end
-    end
-  end
-end
-
----Apply color propagation rules
----@param colors aether.Palette Colors to modify
----@param opts_colors table User color overrides
-local function apply_propagation(colors, opts_colors)
-  for source, variants in pairs(propagation) do
-    if opts_colors[source] then
-      for _, variant in ipairs(variants) do
-        -- Only propagate if variant wasn't explicitly set
-        if colors[variant] == palette[variant] then
-          colors[variant] = colors[source]
-        end
-      end
-    end
-  end
-end
 
 ---Setup the color palette
 ---@param opts aether.Config
@@ -144,9 +79,7 @@ function M.setup(opts)
 
   -- Apply user color overrides
   if opts.colors and next(opts.colors) then
-    apply_base16(colors, opts.colors)
     colors = vim.tbl_deep_extend("force", colors, opts.colors)
-    apply_propagation(colors, opts.colors)
   end
 
   -- Update Util defaults for blending
@@ -155,87 +88,85 @@ function M.setup(opts)
 
   colors.none = "NONE"
 
-  -- Git colors (derived from theme)
+  -- Git colors
   colors.git = {
-    add = colors.green2,
-    delete = colors.red1,
+    add = colors.green,
+    delete = colors.red,
     change = colors.orange,
-    ignore = colors.dark3,
+    ignore = colors.muted,
   }
 
   -- Diff colors (blended backgrounds)
   colors.diff = {
-    add = Util.blend_bg(colors.green2, 0.25),
-    delete = Util.blend_bg(colors.red1, 0.25),
-    change = Util.blend_bg(colors.blue7, 0.15),
-    text = colors.blue7,
+    add = Util.blend_bg(colors.green, 0.25),
+    delete = Util.blend_bg(colors.red, 0.25),
+    change = Util.blend_bg(colors.selection, 0.15),
+    text = colors.selection,
   }
 
   -- Derived colors
   colors.black = Util.blend_bg(colors.bg, 0.8, colors.bg)
-  colors.border_highlight = Util.blend_bg(colors.blue1, 0.8)
-  colors.border = colors.black
+  colors.border_highlight = Util.blend_bg(colors.blue, 0.8)
+  colors.border = colors.muted
 
   -- UI backgrounds
-  colors.bg_popup = colors.bg_dark
-  colors.bg_statusline = colors.bg_dark
+  colors.bg_popup = colors.dark_bg
+  colors.bg_statusline = colors.dark_bg
 
   colors.bg_sidebar = opts.styles.sidebars == "transparent" and colors.none
-    or opts.styles.sidebars == "dark" and colors.bg_dark
+    or opts.styles.sidebars == "dark" and colors.dark_bg
     or colors.bg
 
   colors.bg_float = opts.styles.floats == "transparent" and colors.none
-    or opts.styles.floats == "dark" and colors.bg_dark
+    or opts.styles.floats == "dark" and colors.dark_bg
     or colors.bg
 
   -- Selection and search
-  colors.bg_visual = Util.blend_bg(colors.blue0, 0.4)
-  colors.bg_search = colors.blue0
+  colors.bg_visual = colors.selection
+  colors.bg_search = Util.blend_bg(colors.blue, 0.4)
   colors.fg_sidebar = colors.fg
   colors.fg_float = colors.fg
 
   -- Diagnostics
-  colors.error = colors.red1
+  colors.error = colors.red
   colors.warning = colors.yellow
-  colors.info = colors.blue2
-  colors.hint = colors.teal
-  colors.todo = colors.blue
+  colors.info = colors.blue
+  colors.hint = colors.cyan
+  colors.todo = colors.bright_blue
 
   -- Subtle highlights
   colors.subtle_bg = Util.blend_bg(colors.fg, 0.10)
   colors.cursorline_bg = Util.blend_bg(colors.fg, 0.20)
-  colors.selection_bg = Util.blend_bg(colors.fg, 0.25)
-  colors.float_bg = Util.blend_bg(colors.fg, 0.12)
 
   -- Rainbow colors (for indent guides, etc.)
   colors.rainbow = {
     colors.blue,
     colors.yellow,
     colors.green,
-    colors.teal,
-    colors.magenta,
+    colors.cyan,
     colors.purple,
     colors.orange,
     colors.red,
+    colors.brown,
   }
 
   -- Terminal colors
   colors.terminal = {
     black = colors.black,
-    black_bright = colors.terminal_black,
+    black_bright = colors.lighter_bg,
     red = colors.red,
-    red_bright = colors.red,
+    red_bright = colors.bright_red,
     green = colors.green,
-    green_bright = colors.green,
+    green_bright = colors.bright_green,
     yellow = colors.yellow,
-    yellow_bright = colors.yellow,
+    yellow_bright = colors.bright_yellow,
     blue = colors.blue,
-    blue_bright = colors.blue,
-    magenta = colors.magenta,
-    magenta_bright = colors.magenta,
+    blue_bright = colors.bright_blue,
+    magenta = colors.purple,
+    magenta_bright = colors.bright_purple,
     cyan = colors.cyan,
-    cyan_bright = colors.cyan,
-    white = colors.fg_dark,
+    cyan_bright = colors.bright_cyan,
+    white = colors.dark_fg,
     white_bright = colors.fg,
   }
 

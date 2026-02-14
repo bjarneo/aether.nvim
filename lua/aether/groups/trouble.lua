@@ -5,20 +5,20 @@ local M = {}
 function M.get(c, opts)
   -- stylua: ignore
   return {
-    TroubleText        = { fg = c.fg_dark },
-    TroubleCount       = { fg = c.magenta, bg = c.fg_gutter },
+    TroubleText        = { fg = c.dark_fg },
+    TroubleCount       = { fg = c.bright_purple, bg = c.muted },
     TroubleNormal      = { fg = c.fg, bg = c.bg_sidebar },
     TroubleTextInformation = { fg = c.info },
     TroubleSignWarning = { fg = c.warning },
     TroubleSignInformation = { fg = c.info },
     TroubleSignHint    = { fg = c.hint },
-    TroubleSignError   = { fg = c.error },
-    TroubleSignOther   = { fg = c.purple },
-    TroubleIndent      = { fg = c.fg_gutter },
-    TroubleLocation    = { fg = c.comment },
-    TroubleFoldIcon    = { fg = c.comment },
+    TroubleSignError   = { fg = c.bright_red },
+    TroubleSignOther   = { fg = c.bright_purple },
+    TroubleIndent      = { fg = c.muted },
+    TroubleLocation    = { fg = c.muted },
+    TroubleFoldIcon    = { fg = c.muted },
     TroubleFile        = { fg = c.blue },
-    TroubleCode        = { fg = c.comment },
+    TroubleCode        = { fg = c.muted },
   }
 end
 

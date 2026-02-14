@@ -5,8 +5,8 @@ local M = {}
 function M.get(c, opts)
   -- stylua: ignore
   return {
-    IblIndent = { fg = c.fg_gutter, nocombine = true },
-    IblScope  = { fg = c.blue1, nocombine = true },
+    IblIndent = { fg = c.muted, nocombine = true },
+    IblScope  = { fg = c.blue, nocombine = true },
   }
 end
 

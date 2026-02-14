@@ -9,22 +9,22 @@ function M.get(c, opts)
     or Util.blend(c.bg_sidebar, 0.8, c.bg)
   -- stylua: ignore
   return {
-    NeoTreeDimText             = { fg = c.fg_gutter },
+    NeoTreeDimText             = { fg = c.muted },
     NeoTreeFileName            = { fg = c.fg_sidebar },
-    NeoTreeGitModified         = { fg = c.git.change },  -- Modified files
-    NeoTreeGitStaged           = { fg = c.git.add },     -- Staged files
-    NeoTreeGitUntracked        = { fg = c.orange },      -- Untracked files (new files not in git)
-    NeoTreeGitUnstaged         = { fg = c.git.change },  -- Unstaged changes
-    NeoTreeGitConflict         = { fg = c.red },         -- Merge conflicts
-    NeoTreeGitIgnored          = { fg = c.comment },     -- Ignored files
-    NeoTreeGitAdded            = { fg = c.git.add },     -- Added files
-    NeoTreeGitDeleted          = { fg = c.git.delete },  -- Deleted files
-    NeoTreeGitRenamed          = { fg = c.orange },      -- Renamed files
+    NeoTreeGitModified         = { fg = c.git.change },
+    NeoTreeGitStaged           = { fg = c.git.add },
+    NeoTreeGitUntracked        = { fg = c.orange },
+    NeoTreeGitUnstaged         = { fg = c.git.change },
+    NeoTreeGitConflict         = { fg = c.bright_red },
+    NeoTreeGitIgnored          = { fg = c.muted },
+    NeoTreeGitAdded            = { fg = c.git.add },
+    NeoTreeGitDeleted          = { fg = c.bright_red },
+    NeoTreeGitRenamed          = { fg = c.orange },
     NeoTreeNormal              = { fg = c.fg_sidebar, bg = c.bg_sidebar },
     NeoTreeNormalNC            = { fg = c.fg_sidebar, bg = c.bg_sidebar },
-    NeoTreeTabActive           = { fg = c.blue, bg = c.bg_dark, bold = true },
-    NeoTreeTabInactive         = { fg = c.dark3, bg = dark },
-    NeoTreeTabSeparatorActive  = { fg = c.blue, bg = c.bg_dark },
+    NeoTreeTabActive           = { fg = c.blue, bg = c.dark_bg, bold = true },
+    NeoTreeTabInactive         = { fg = c.muted, bg = dark },
+    NeoTreeTabSeparatorActive  = { fg = c.blue, bg = c.dark_bg },
     NeoTreeTabSeparatorInactive= { fg = c.bg, bg = dark },
     NeoTreeDirectoryIcon       = { fg = c.blue },
     NeoTreeDirectoryName       = { fg = c.blue },

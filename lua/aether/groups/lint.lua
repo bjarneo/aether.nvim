@@ -5,7 +5,7 @@ local M = {}
 function M.get(c, opts)
   -- stylua: ignore
   return {
-    LintError   = { fg = c.error },
+    LintError   = { fg = c.bright_red },
     LintWarning = { fg = c.warning },
     LintInfo    = { fg = c.info },
     LintHint    = { fg = c.hint },

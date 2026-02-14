@@ -1,32 +1,27 @@
 # Aether.nvim
 
-A modern Neovim colorscheme with semantic color customization and extensive plugin support.
+A dark Neovim colorscheme with WCAG accessible contrast ratios, direct color injection, and broad plugin support.
 
-> **Note:** This is the `v2` branch with a cleaner API. Use `branch = "v2"` in your plugin config.
+> **Branch note:** This is the `v3` branch. Use `branch = "v3"` in your plugin manager.
 
 ![Aether.nvim](theme.png)
 
-## Features
-
-- Direct color injection for easy customization
-- Support for 25+ popular Neovim plugins
-- Transparent background support
-- Hot reload for development
-- Lualine theme included
-
 ## Requirements
 
-- Neovim 0.8+
-- Terminal with true color support
+Neovim 0.8 or later with true color support enabled:
 
-## Installation
+```lua
+vim.opt.termguicolors = true
+```
 
-### Basic Setup (lazy.nvim)
+## Install
+
+### lazy.nvim
 
 ```lua
 {
     "bjarneo/aether.nvim",
-    branch = "v2",
+    branch = "v3",
     priority = 1000,
     config = function()
         require("aether").setup()
@@ -35,36 +30,52 @@ A modern Neovim colorscheme with semantic color customization and extensive plug
 }
 ```
 
-### With Custom Colors
+### With custom colors
+
+Every palette color is a named variable you can override directly. Pass any combination through the `colors` table.
 
 ```lua
 {
     "bjarneo/aether.nvim",
-    branch = "v2",
+    branch = "v3",
     name = "aether",
     priority = 1000,
     opts = {
-        transparent = false,
         colors = {
-            -- Background colors
-            bg = "#0c0c0c",
-            bg_dark = "#0c0c0c",
-            bg_highlight = "#1a1a1a",
+            bg         = "#1a1d24",
+            dark_bg    = "#13161c",
+            darker_bg  = "#0e1015",
+            lighter_bg = "#242830",
 
-            -- Foreground colors
-            fg = "#f5e8d1",
-            fg_dark = "#e4bf7c",
-            comment = "#bfac89",
+            fg         = "#a2aebb",
+            dark_fg    = "#6b7688",
+            light_fg   = "#c0ccd5",
+            bright_fg  = "#dfe6eb",
+            muted      = "#4a5366",
 
-            -- Accent colors
-            red = "#d40d09",
-            orange = "#fd971f",
-            yellow = "#dd920a",
-            green = "#969408",
-            cyan = "#4a8699",
-            blue = "#275d7c",
-            purple = "#bb3b74",
-            magenta = "#ae81ff",
+            red        = "#ad523c",
+            yellow     = "#d4a05a",
+            orange     = "#c47a4e",
+            green      = "#5e9a7e",
+            cyan       = "#5b9ea0",
+            blue       = "#5a8faa",
+            purple     = "#8b6e9e",
+            brown      = "#7d5440",
+
+            bright_red    = "#c46e5a",
+            bright_yellow = "#e0b87a",
+            bright_green  = "#7eb89a",
+            bright_cyan   = "#7ebcbe",
+            bright_blue   = "#7aaac2",
+            bright_purple = "#a68eba",
+
+            accent               = "#ad523c",
+            cursor               = "#a2aebb",
+            foreground           = "#a2aebb",
+            background           = "#1a1d24",
+            selection             = "#2c3040",
+            selection_foreground = "#dfe6eb",
+            selection_background = "#4a5366",
         },
     },
     config = function(_, opts)
@@ -74,33 +85,7 @@ A modern Neovim colorscheme with semantic color customization and extensive plug
 }
 ```
 
-### With Hot Reload (for development)
-
-```lua
-{
-    "bjarneo/aether.nvim",
-    branch = "v2",
-    name = "aether",
-    priority = 1000,
-    opts = {
-        colors = {
-            bg = "#0c0c0c",
-            fg = "#f5e8d1",
-            red = "#d40d09",
-            -- ... your colors
-        },
-    },
-    config = function(_, opts)
-        require("aether").setup(opts)
-        vim.cmd.colorscheme("aether")
-
-        -- Enable hot reload - theme auto-reloads when you save lua files
-        require("aether.hotreload").setup()
-    end,
-}
-```
-
-### With LazyVim
+### LazyVim
 
 Create `~/.config/nvim/lua/plugins/colorscheme.lua`:
 
@@ -108,30 +93,13 @@ Create `~/.config/nvim/lua/plugins/colorscheme.lua`:
 return {
     {
         "bjarneo/aether.nvim",
-        branch = "v2",
+        branch = "v3",
         name = "aether",
         priority = 1000,
-        opts = {
-            colors = {
-                bg = "#0c0c0c",
-                fg = "#f5e8d1",
-                comment = "#bfac89",
-                red = "#d40d09",
-                orange = "#f6312d",
-                yellow = "#dd920a",
-                green = "#969408",
-                cyan = "#4a8699",
-                blue = "#275d7c",
-                purple = "#bb3b74",
-                magenta = "#ae81ff",
-            },
-        },
+        opts = {},
         config = function(_, opts)
             require("aether").setup(opts)
             vim.cmd.colorscheme("aether")
-
-            -- Optional: Enable hot reload
-            require("aether.hotreload").setup()
         end,
     },
     {
@@ -143,205 +111,145 @@ return {
 }
 ```
 
-## Configuration Options
+## Configuration
+
+All options and their defaults:
 
 ```lua
 require("aether").setup({
-    transparent = false,           -- Enable transparent background
-    terminal_colors = true,        -- Configure terminal colors
-    dim_inactive = false,          -- Dim inactive windows
-    lualine_bold = false,          -- Bold lualine section headers
+    transparent = false,
+    terminal_colors = true,
+    dim_inactive = false,
+    lualine_bold = false,
 
     styles = {
         comments = { italic = true },
         keywords = { italic = true },
         functions = {},
         variables = {},
-        sidebars = "dark",         -- "dark", "transparent", or "normal"
-        floats = "dark",           -- "dark", "transparent", or "normal"
+        sidebars = "dark",     -- "dark", "transparent", or "normal"
+        floats = "dark",       -- "dark", "transparent", or "normal"
     },
 
-    -- Color customization (override any palette color)
-    -- These colors automatically propagate to their variants
-    colors = {
-        -- Background colors
-        bg = "#000000",            -- Default background → bg_dark, bg_dark1
-        bg_dark = "#000000",       -- Sidebars, statusline (optional override)
-        bg_highlight = "#000000",  -- Cursorline, selection
+    colors = {},
 
-        -- Foreground colors
-        fg = "#d8d8d8",            -- Default text color
-        fg_dark = "#b8b8b8",       -- Statusline, inactive → dark5
-        comment = "#585858",       -- Comments → dark3, fg_gutter, terminal_black
+    on_colors = function(colors) end,
 
-        -- Accent colors (propagate to variants)
-        red = "#f92672",           -- Errors, deletions → red1
-        orange = "#fd971f",        -- Numbers, constants
-        yellow = "#f4bf75",        -- Types, classes
-        green = "#a6e22e",         -- Strings → green1, green2
-        cyan = "#66d9ef",          -- Regex, PreProc, Special → teal
-        blue = "#66d9ef",          -- Keywords, info → blue0-7
-        purple = "#ae81ff",        -- Keywords, tags → magenta
-        magenta = "#ae81ff",       -- Functions, identifiers → magenta2
+    on_highlights = function(highlights, colors) end,
 
-        -- Optional: directly set if you want different values
-        special_char = "#cc6633",  -- Escape sequences (\n, \t)
+    plugins = {
+        all = package.loaded.lazy == nil,
+        auto = true,
     },
+})
+```
 
-    -- Advanced: Customize derived colors
+## Color Palette
+
+All 30 named variables in the default palette. Override any of them through the `colors` table.
+
+### Backgrounds
+
+| Name | Hex | Purpose |
+|------|-----|---------|
+| `bg` | `#1a1d24` | Editor background |
+| `dark_bg` | `#13161c` | Sidebars, statusline |
+| `darker_bg` | `#0e1015` | Darkest background |
+| `lighter_bg` | `#242830` | Cursor line, highlights |
+| `background` | `#1a1d24` | Background (terminal alias) |
+
+### Foregrounds
+
+| Name | Hex | Purpose |
+|------|-----|---------|
+| `fg` | `#a2aebb` | Default text |
+| `dark_fg` | `#6b7688` | Secondary text |
+| `light_fg` | `#c0ccd5` | Light foreground |
+| `bright_fg` | `#dfe6eb` | Brightest foreground |
+| `muted` | `#4a5366` | Comments, line numbers |
+| `foreground` | `#a2aebb` | Foreground (terminal alias) |
+
+### Accents
+
+| Name | Hex | Purpose |
+|------|-----|---------|
+| `accent` | `#ad523c` | Primary accent |
+| `red` | `#ad523c` | Errors, deletions |
+| `yellow` | `#d4a05a` | Types, warnings |
+| `orange` | `#c47a4e` | Constants, numbers |
+| `green` | `#5e9a7e` | Strings, additions |
+| `cyan` | `#5b9ea0` | Regex, hints |
+| `blue` | `#5a8faa` | Keywords, info |
+| `purple` | `#8b6e9e` | Storage, tags |
+| `brown` | `#7d5440` | Escape sequences |
+
+### Bright Variants
+
+WCAG AA compliant versions used for text on the default background. Each meets a minimum 4.5:1 contrast ratio against `bg`.
+
+| Name | Hex |
+|------|-----|
+| `bright_red` | `#c46e5a` |
+| `bright_yellow` | `#e0b87a` |
+| `bright_green` | `#7eb89a` |
+| `bright_cyan` | `#7ebcbe` |
+| `bright_blue` | `#7aaac2` |
+| `bright_purple` | `#a68eba` |
+
+### Selection
+
+| Name | Hex | Purpose |
+|------|-----|---------|
+| `cursor` | `#a2aebb` | Cursor color |
+| `selection` | `#2c3040` | Visual selection |
+| `selection_foreground` | `#dfe6eb` | Selection text |
+| `selection_background` | `#4a5366` | Selection background |
+
+## Derived Colors
+
+These colors are computed from the palette at load time. They are not injectable directly but can be changed through `on_colors`.
+
+| Name | Derived from | Purpose |
+|------|--------------|---------|
+| `error` | `red` | Diagnostic errors |
+| `warning` | `yellow` | Diagnostic warnings |
+| `info` | `blue` | Diagnostic info |
+| `hint` | `cyan` | Diagnostic hints |
+| `todo` | `bright_blue` | Todo highlights |
+| `border` | `muted` | Window borders |
+| `git.add` | `green` | Git additions |
+| `git.delete` | `red` | Git deletions |
+| `git.change` | `orange` | Git changes |
+
+## Advanced Customization
+
+### Override derived colors
+
+Use `on_colors` to modify any color after the palette is resolved:
+
+```lua
+require("aether").setup({
     on_colors = function(colors)
         colors.hint = colors.orange
         colors.error = "#ff0000"
     end,
+})
+```
 
-    -- Advanced: Customize highlight groups
+### Override highlight groups
+
+Use `on_highlights` to change any highlight group directly:
+
+```lua
+require("aether").setup({
     on_highlights = function(hl, colors)
-        hl.Comment = { fg = colors.comment, italic = true }
+        hl.Comment = { fg = colors.muted, italic = true }
+        hl.Function = { fg = colors.bright_blue, bold = true }
     end,
-
-    plugins = {
-        all = package.loaded.lazy == nil,  -- Enable all when not using lazy.nvim
-        auto = true,                       -- Auto-detect loaded plugins
-    },
 })
 ```
 
-## Color Reference
-
-When you inject colors, they automatically propagate to their variants:
-
-| Injected Color | Propagates To | Used For |
-|----------------|---------------|----------|
-| `bg` | `bg_dark`, `bg_dark1` | Editor background, sidebars |
-| `fg_dark` | `dark5` | Statusline, inactive text |
-| `comment` | `dark3`, `fg_gutter`, `terminal_black` | Comments, line numbers |
-| `red` | `red1` | Errors, git delete |
-| `green` | `green1`, `green2` | Strings, git add |
-| `blue` | `blue0`-`blue7` | Keywords, operators, info |
-| `cyan` | `teal` | Regex, PreProc, Special, hints |
-| `purple` | `magenta` | Keywords, tags |
-| `magenta` | `magenta2` | Functions, identifiers |
-
-**All injectable colors:**
-- `bg`, `bg_dark`, `bg_highlight` - Backgrounds
-- `fg`, `fg_dark`, `comment` - Foregrounds
-- `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta` - Accents
-- `special_char` - Escape sequences in strings
-
-## Base16 Compatibility (Legacy)
-
-For backwards compatibility, base16 color names are still supported and automatically mapped:
-
-```lua
-colors = {
-    -- These base16 names still work and map to semantic colors
-    base00 = "#000000",  -- → bg (default background)
-    base01 = "#282828",  -- → terminal_black (lighter background)
-    base02 = "#383838",  -- → bg_highlight (selection background)
-    base03 = "#585858",  -- → comment, fg_gutter (comments, line numbers)
-    base04 = "#b8b8b8",  -- → fg_dark (dark foreground)
-    base05 = "#d8d8d8",  -- → fg (default foreground)
-    base08 = "#f92672",  -- → red (errors, variables)
-    base09 = "#fd971f",  -- → orange (numbers, constants)
-    base0A = "#f4bf75",  -- → yellow (types, classes)
-    base0B = "#a6e22e",  -- → green (strings)
-    base0C = "#66d9ef",  -- → cyan, teal (regex, escapes)
-    base0D = "#66d9ef",  -- → blue (functions, keywords)
-    base0E = "#ae81ff",  -- → purple, magenta (keywords, storage)
-    base0F = "#cc6633",  -- → special_char (escape sequences)
-}
-```
-
-## Hot Reload
-
-Hot reload automatically refreshes the theme when you edit plugin files or your config.
-
-### Enable Hot Reload
-
-```lua
-require("aether.hotreload").setup()
-```
-
-### Manual Reload
-
-```vim
-:AetherReload
-```
-
-## Lualine Integration
-
-```lua
-require("lualine").setup({
-    options = {
-        theme = "aether",
-    },
-})
-```
-
-The lualine theme automatically uses your custom colors.
-
-## Supported Plugins
-
-### Core
-- LSP (diagnostics, semantic tokens)
-- Treesitter
-- Markdown
-
-### File Navigation
-- Telescope
-- NvimTree
-- Neo-tree
-
-### Git
-- GitSigns
-- Diffview
-- Git (commit/diff)
-
-### UI/Utilities
-- Flash
-- Trouble
-- WhichKey
-- Indent Blankline
-- Noice
-- Snacks
-- Fidget
-- Lualine
-
-### Development
-- Blink.cmp
-- nvim-dap
-- Conform
-- Lint
-- Mini.nvim
-- Mason
-- Comment
-
-## Creating Theme Variants
-
-You can create your own colorscheme variant with a custom name by creating a `colors/*.lua` file in your Neovim config:
-
-**~/.config/nvim/colors/hackerman.lua:**
-```lua
--- Load aether with custom config
-require("aether").load({
-    name = "hackerman",
-    colors = {
-        bg = "#000000",
-        fg = "#00ff00",
-        green = "#00ff00",
-        -- etc...
-    },
-})
-```
-
-Then use it like any other colorscheme:
-```vim
-:colorscheme hackerman
-```
-
-## Examples
-
-### Transparent Background
+### Transparent background
 
 ```lua
 require("aether").setup({
@@ -353,19 +261,7 @@ require("aether").setup({
 })
 ```
 
-### Custom Accent Colors
-
-```lua
-require("aether").setup({
-    colors = {
-        red = "#ff5555",
-        green = "#50fa7b",
-        blue = "#8be9fd",
-    },
-})
-```
-
-### Disable Italics
+### Disable italics
 
 ```lua
 require("aether").setup({
@@ -376,31 +272,65 @@ require("aether").setup({
 })
 ```
 
-## Troubleshooting
+## Creating a Variant
 
-### Colors look wrong
+Create your own named colorscheme by adding a file at `~/.config/nvim/colors/<name>.lua`:
 
-Ensure true colors are enabled:
 ```lua
-vim.opt.termguicolors = true
+require("aether").load({
+    name = "midnight",
+    colors = {
+        bg = "#000000",
+        fg = "#c0c0c0",
+        blue = "#6699cc",
+    },
+})
 ```
 
-### Theme not applying
+Then activate it:
 
-Make sure you call `vim.cmd.colorscheme("aether")` after `setup()`:
-```lua
-require("aether").setup({ ... })
-vim.cmd.colorscheme("aether")
+```vim
+:colorscheme midnight
 ```
+
+## Lualine
+
+The lualine theme loads automatically when you set it:
+
+```lua
+require("lualine").setup({
+    options = {
+        theme = "aether",
+    },
+})
+```
+
+## Hot Reload
+
+For theme development, enable hot reload to automatically refresh when you save plugin files:
+
+```lua
+require("aether.hotreload").setup()
+```
+
+To reload manually:
+
+```vim
+:AetherReload
+```
+
+## Supported Plugins
+
+Aether provides highlight groups for these plugins. Loaded plugins are detected automatically.
+
+Blink.cmp, Comment.nvim, conform.nvim, Diffview, Fidget, Flash, Gitsigns, indent blankline, Mason, Mini.nvim, Neo tree, Noice, nvim dap, nvim lint, nvim tree, Snacks, Telescope, Trouble, Which Key
+
+Core support is always loaded for LSP diagnostics, Treesitter, Markdown, and Git.
 
 ## License
 
-MIT License
-
-## Credits
-
-- Inspired by [TokyoNight.nvim](https://github.com/folke/tokyonight.nvim)
+MIT
 
 ## Author
 
-Created by Bjarne Øverli - [@iamdothash](https://x.com/iamdothash)
+Bjarne Øverli ([@iamdothash](https://x.com/iamdothash))

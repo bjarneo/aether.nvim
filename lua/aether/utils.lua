@@ -2,9 +2,9 @@
 local M = {}
 
 ---@type string Default background for blending
-M.bg = "#000000"
+M.bg = "#1a1d24"
 ---@type string Default foreground for blending
-M.fg = "#d8d8d8"
+M.fg = "#a2aebb"
 
 ---Parse hex color to RGB components
 ---@param hex string Hex color string (e.g., "#ff0000")
@@ -53,10 +53,6 @@ end
 function M.blend_fg(hex, amount, fg)
   return M.blend(hex, amount, fg or M.fg)
 end
-
--- Aliases
-M.darken = M.blend_bg
-M.lighten = M.blend_fg
 
 ---Resolve style tables in highlight definitions
 ---@param groups table<string, aether.Highlight> Highlight groups
