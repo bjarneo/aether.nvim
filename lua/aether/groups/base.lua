@@ -74,7 +74,7 @@ function M.get(c, opts)
     WinBarNC                    = { link = "StatusLineNC" },
 
     -- Syntax
-    Constant                    = { fg = c.bright_purple },
+    Constant                    = { fg = c.bright_yellow },
     String                      = { fg = c.green },
     Character                   = { fg = c.green },
     Number                      = { fg = c.orange },
