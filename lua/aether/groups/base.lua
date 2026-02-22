@@ -6,7 +6,7 @@ local M = {}
 function M.get(c, opts)
   -- stylua: ignore
   return {
-    Comment                     = { fg = c.green, style = opts.styles.comments }, -- any comment
+    Comment                     = { fg = c.muted, style = opts.styles.comments }, -- any comment
     ColorColumn                 = { bg = c.black }, -- used for the columns set with 'colorcolumn'
     Conceal                     = { fg = c.dark_fg }, -- placeholder characters substituted for concealed text
     Cursor                      = { fg = c.bg, bg = c.fg }, -- character under the cursor
