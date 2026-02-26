@@ -80,6 +80,24 @@ function M.setup(opts)
   -- Allow users to override colors via opts.colors table (base16 style)
   if opts.colors and next(opts.colors) then
     colors = vim.tbl_deep_extend("force", colors, opts.colors)
+
+    -- If a base accent is overridden without its variants, inherit variants.
+    local fallback_variants = {
+      green = { "green1", "green2" },
+      blue = { "blue1", "blue2" },
+      red = { "red1" },
+      magenta = { "magenta2" },
+    }
+
+    for base, variants in pairs(fallback_variants) do
+      if opts.colors[base] then
+        for _, variant in ipairs(variants) do
+          if not opts.colors[variant] then
+            colors[variant] = colors[base]
+          end
+        end
+      end
+    end
     
     -- Map base16 colors to semantic names AND all variants if base16 colors were provided
     if opts.colors.base00 then 
